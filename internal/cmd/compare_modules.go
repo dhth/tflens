@@ -15,8 +15,8 @@ func newCompareModulesCmd(
 ) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
-		Short: "Compare a module attribute across multiple Terraform files",
-		Long: `Compare a module attribute across multiple Terraform files.
+		Short: "Compare a module by an attribute across multiple Terraform sources",
+		Long: `Compare a module by an attribute across multiple Terraform sources.
 
 This reads module blocks from the specified sources and compares a given attribute
 (like 'source' or 'version') across them. Can be useful for ensuring consistency
