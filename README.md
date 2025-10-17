@@ -50,8 +50,8 @@ tflens compare-modules all-envs
 ```
 
 ```text
-module      qa       staging    prod     in-sync
+module      dev      staging    prod     in-sync
 module_a    1.1.1    1.1.1      1.1.1    ✓
 module_b    1.0.8    1.0.1      1.0.0    ✗
-module_c    1.0.5    -          -        -
+module_c    1.0.5    1.0.5      -        ✗
 ```
