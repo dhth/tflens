@@ -1,0 +1,18 @@
+success: false
+exit_code: 1
+----- stdout -----
+
+----- stderr -----
+Error: couldn't parse config: [12:22] value is not allowed in this context. map key-value is pre-defined
+> 12 |   comparisons
+  13 |     - name: apps
+  14 |       attributeKey: source
+  15 |       sources:
+  16 |         - path: testdata/environments/qa/main.tf
+  17 |           label: qa
+  18 |         - path: testdata/environments/staging/main.tf
+  19 |           label: staging
+  20 |         - path: testdata/environments/prod/main.tf
+  21 |           label: prod
+                            ^
+

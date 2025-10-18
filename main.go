@@ -17,6 +17,8 @@ func main() {
 		switch {
 		case errors.Is(err, services.ErrModulesNotInSync):
 		case errors.Is(err, cmd.ErrConfigValidationFoundErrors):
+		case errors.Is(err, cmd.ErrCouldntParseConfig):
+			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 		default:
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 

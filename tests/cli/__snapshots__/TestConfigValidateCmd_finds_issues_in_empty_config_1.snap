@@ -1,0 +1,8 @@
+success: false
+exit_code: 1
+----- stdout -----
+config has errors:
+- config has no comparisons configured
+
+----- stderr -----
+

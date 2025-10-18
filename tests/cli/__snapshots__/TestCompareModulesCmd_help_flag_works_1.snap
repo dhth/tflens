@@ -1,34 +1,14 @@
-<p align="center">
-  <h1 align="center">tflens</h1>
-  <p align="center">
-    <a href="https://github.com/dhth/tflens/actions/workflows/main.yml"><img alt="main" src="https://img.shields.io/github/actions/workflow/status/dhth/tflens/main.yml?style=flat-square"></a>
-    <a href="https://github.com/dhth/tflens/actions/workflows/vulncheck.yml"><img alt="vulncheck" src="https://img.shields.io/github/actions/workflow/status/dhth/tflens/vulncheck.yml?style=flat-square&label=vulncheck"></a>
-  </p>
-</p>
+success: true
+exit_code: 0
+----- stdout -----
+Compare modules by an attribute across multiple Terraform sources.
 
-`tflens` offers tiny utilities for terraform/opentofu/terragrunt codebases.
+This reads module blocks from the specified sources and compares a given attribute
+(like 'source' or 'version') across them. Can be useful for ensuring consistency
+across environments.
 
-> [!NOTE]
-> `tflens` is alpha software. It's behaviour and interface is likely to change
-> for a while.
-
-Install
+Example tflens.yml:
 ---
-
-**go**:
-
-```sh
-go install github.com/dhth/tflens@latest
-```
-
-Usage
----
-
-Consider a terragrunt codebase with three different deployment environments:
-`dev`, `prod-us`, and `prod-eu`. If you want to compare modules across all three
-environments, you can define a comparison in `tflens.yml`:
-
-```yaml
 compareModules:
   # list of configured comparisons
   comparisons:
@@ -54,17 +34,21 @@ compareModules:
   # applies to all comparisons
   # optional
   valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
-```
+---
 
-You can then compare the modules as follows.
+$ tflens compare-modules apps
 
-```bash
-tflens compare-modules apps
-```
-
-```text
 module      dev       prod-us    prod-eu    in-sync
 module_a    1.0.24    1.0.24     1.0.24     ✓
 module_b    0.2.0     0.2.0      -          ✗
 module_c    1.1.1     1.1.1      1.1.0      ✗
-```
+
+Usage:
+  tflens compare-modules <COMPARISON> [flags]
+
+Flags:
+  -c, --config-path string   path to tflens' configuration file (default "tflens.yml")
+  -h, --help                 help for compare-modules
+
+----- stderr -----
+

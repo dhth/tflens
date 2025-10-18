@@ -1,0 +1,12 @@
+compareModules:
+  valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
+  comparisons
+    - name: apps
+      attributeKey: source
+      sources:
+        - path: testdata/environments/qa/main.tf
+          label: qa
+        - path: testdata/environments/staging/main.tf
+          label: staging
+        - path: testdata/environments/prod/main.tf
+          label: prod

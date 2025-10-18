@@ -59,7 +59,9 @@ func newConfigValidateCmd() *cobra.Command {
 			}
 
 			_, err = getConfig(configBytes)
-			if err != nil {
+			if errors.Is(err, ErrCouldntParseConfig) {
+				return err
+			} else if err != nil {
 				fmt.Println(err.Error())
 				return ErrConfigValidationFoundErrors
 			}
