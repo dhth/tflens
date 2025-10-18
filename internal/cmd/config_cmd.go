@@ -2,13 +2,17 @@ package cmd
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
 
 //go:embed assets/sample-config.yml
 var sampleConfig string
+
+var ErrConfigValidationFoundErrors = errors.New("config validation found errors")
 
 func newConfigCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -17,6 +21,7 @@ func newConfigCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(newConfigSampleCmd())
+	cmd.AddCommand(newConfigValidateCmd())
 
 	return cmd
 }
@@ -36,6 +41,41 @@ $ tflens config sample > tflens.yml
 			return nil
 		},
 	}
+
+	return cmd
+}
+
+func newConfigValidateCmd() *cobra.Command {
+	var configPath string
+
+	cmd := &cobra.Command{
+		Use:          "validate",
+		Short:        "Validate tflens' configuration file",
+		SilenceUsage: true,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			configBytes, err := os.ReadFile(configPath)
+			if err != nil {
+				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
+			}
+
+			_, err = getConfig(configBytes)
+			if err != nil {
+				fmt.Println(err.Error())
+				return ErrConfigValidationFoundErrors
+			}
+
+			fmt.Println("Configuration is valid")
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(
+		&configPath,
+		"config-path",
+		"c",
+		configFileName,
+		"path to tflens' configuration file",
+	)
 
 	return cmd
 }

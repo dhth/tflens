@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newCompareModulesCmd(
-	preRunE func(*cobra.Command, []string) error,
-	config *domain.Config,
-) *cobra.Command {
+func newCompareModulesCmd() *cobra.Command {
+	var config domain.Config
+	var configPath string
+
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
 		Short: "Compare modules by an attribute across multiple Terraform sources",
@@ -45,9 +45,21 @@ module_a    1.1.1    1.1.1      1.1.1    ✓
 module_b    1.0.8    1.0.1      1.0.0    ✗
 module_c    1.0.5    1.0.5      -        ✗
 `,
-		Args:              cobra.ExactArgs(1),
-		SilenceUsage:      true,
-		PersistentPreRunE: preRunE,
+		Args:         cobra.ExactArgs(1),
+		SilenceUsage: true,
+
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			configBytes, err := os.ReadFile(configPath)
+			if err != nil {
+				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
+			}
+			config, err = getConfig(configBytes)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
 		RunE: func(_ *cobra.Command, args []string) error {
 			comparisonName := args[0]
 			var comparisonToUse *domain.Comparison
@@ -65,6 +77,14 @@ module_c    1.0.5    1.0.5      -        ✗
 			return services.ShowModuleComparison(os.Stdout, *comparisonToUse, config.CompareModules.ValueRegex)
 		},
 	}
+
+	cmd.Flags().StringVarP(
+		&configPath,
+		"config-path",
+		"c",
+		configFileName,
+		"path to tflens' configuration file",
+	)
 
 	return cmd
 }

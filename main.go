@@ -14,8 +14,12 @@ var version = "dev"
 func main() {
 	err := cmd.Execute(version)
 	if err != nil {
-		if !errors.Is(err, services.ErrModulesNotInSync) {
+		switch {
+		case errors.Is(err, services.ErrModulesNotInSync):
+		case errors.Is(err, cmd.ErrConfigValidationFoundErrors):
+		default:
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+
 		}
 		os.Exit(1)
 	}
