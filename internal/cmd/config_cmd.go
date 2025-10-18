@@ -64,7 +64,7 @@ func newConfigValidateCmd() *cobra.Command {
 				return ErrConfigValidationFoundErrors
 			}
 
-			fmt.Printf("Configuration is valid\n")
+			fmt.Println("Configuration is valid")
 			return nil
 		},
 	}

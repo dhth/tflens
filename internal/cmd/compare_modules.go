@@ -48,7 +48,7 @@ module_c    1.0.5    1.0.5      -        ✗
 		Args:         cobra.ExactArgs(1),
 		SilenceUsage: true,
 
-		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+		PreRunE: func(_ *cobra.Command, _ []string) error {
 			configBytes, err := os.ReadFile(configPath)
 			if err != nil {
 				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
