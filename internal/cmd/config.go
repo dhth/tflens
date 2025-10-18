@@ -8,7 +8,10 @@ import (
 	yaml "github.com/goccy/go-yaml"
 )
 
-var ErrCouldntParseConfig = errors.New("couldn't parse config")
+var (
+	ErrCouldntReadConfigFile = errors.New("couldn't read config file")
+	ErrCouldntParseConfig    = errors.New("couldn't parse config")
+)
 
 func getConfig(configBytes []byte) (domain.Config, error) {
 	var raw domain.RawConfig

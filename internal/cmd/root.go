@@ -13,10 +13,7 @@ const (
 	configFileName = "tflens.yml"
 )
 
-var (
-	ErrCouldntReadConfigFile = errors.New("couldn't read config file")
-	ErrComparisonNotFound    = errors.New("comparison not found")
-)
+var ErrComparisonNotFound = errors.New("comparison not found")
 
 func Execute(version string) error {
 	rootCmd, err := NewRootCommand(version)
