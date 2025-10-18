@@ -1,0 +1,21 @@
+compareModules:
+  valueRegex: "(invalidRegex"
+  comparisons:
+    - name: apps
+      attributeKey: source
+      sources:
+        - path: testdata/environments/qa/missing.tf
+          label: qa
+        - path:
+          label: staging
+        - path: testdata/environments/prod/main.tf
+          label:
+      valueRegex: "[invalidRegex"
+
+    - name:
+      attributeKey:
+      sources:
+        - path: testdata/environments/unknown/main.tf
+          label: qa
+        - path: testdata/environments/prod/main.tf
+          label: prod

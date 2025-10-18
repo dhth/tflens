@@ -25,25 +25,38 @@ across environments.
 Example tflens.yml:
 ---
 compareModules:
-  valueRegex: "v?(\\d+\\.\\d+\\.\\d)"
+  # list of configured comparisons
   comparisons:
-    - name: all-envs
+    # will be used when specifying the comparison to be run
+    - name: apps
+      # the attribute to use for comparison
       attributeKey: source
+      # where to look for terraform files
       sources:
-        - path: environments/qa/apps/main.tf
-          label: qa
-        - path: environments/staging/apps/main.tf
-          label: staging
-        - path: environments/prod/apps/main.tf
-          label: prod
+        - path: environments/dev/virginia/apps/main.tf
+          # this label will appear in the comparison output
+          label: dev
+        - path: environments/prod/virginia/apps/main.tf
+          label: prod-us
+        - path: environments/prod/frankfurt/apps/main.tf
+          # regex to extract the desired string from the attribute value
+          # only applies to this source, overrides the global valueRegex
+          # optional
+          valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
+          label: prod-eu
+
+  # regex to extract the desired string from the attribute value
+  # applies to all comparisons
+  # optional
+  valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
 ---
 
-$ tflens compare-modules all-envs
+$ tflens compare-modules apps
 
-module      dev      staging    prod     in-sync
-module_a    1.1.1    1.1.1      1.1.1    ✓
-module_b    1.0.8    1.0.1      1.0.0    ✗
-module_c    1.0.5    1.0.5      -        ✗
+module      dev       prod-us    prod-eu    in-sync
+module_a    1.0.24    1.0.24     1.0.24     ✓
+module_b    0.2.0     0.2.0      -          ✗
+module_c    1.1.1     1.1.1      1.1.0      ✗
 `,
 		Args:         cobra.ExactArgs(1),
 		SilenceUsage: true,

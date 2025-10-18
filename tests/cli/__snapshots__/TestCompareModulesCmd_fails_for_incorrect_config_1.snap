@@ -1,0 +1,17 @@
+success: false
+exit_code: 1
+----- stdout -----
+
+----- stderr -----
+Error: config has errors:
+- invalid global valueRegex: error parsing regexp: missing closing ): `(invalidRegex`
+- comparison #1 has errors:
+  - invalid valueRegex: error parsing regexp: missing closing ]: `[invalidRegex`
+  - source #1 does not exist: testdata/environments/qa/missing.tf
+  - source #2 is empty
+  - source #3 has an empty label
+- comparison #2 has errors:
+  - comparison has an empty name
+  - comparison has an empty attribute key
+  - source #1 does not exist: testdata/environments/unknown/main.tf
+

@@ -1,0 +1,14 @@
+success: true
+exit_code: 0
+----- stdout -----
+Validate tflens' configuration file
+
+Usage:
+  tflens config validate [flags]
+
+Flags:
+  -c, --config-path string   path to tflens' configuration file (default "tflens.yml")
+  -h, --help                 help for validate
+
+----- stderr -----
+

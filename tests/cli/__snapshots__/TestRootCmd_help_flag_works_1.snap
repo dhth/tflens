@@ -1,0 +1,21 @@
+success: true
+exit_code: 0
+----- stdout -----
+tflens offers tiny utilities for terraform/opentofu/terragrunt codebases
+
+Usage:
+  tflens [command]
+
+Available Commands:
+  compare-modules Compare modules by an attribute across multiple Terraform sources
+  config          Manage tflens' configuration
+  help            Help about any command
+
+Flags:
+  -h, --help      help for tflens
+  -v, --version   version for tflens
+
+Use "tflens [command] --help" for more information about a command.
+
+----- stderr -----
+

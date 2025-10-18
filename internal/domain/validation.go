@@ -16,18 +16,25 @@ type comparisonValidationErrors struct {
 }
 
 func NewConfigFromRaw(raw RawConfig) (Config, error) {
-	var validatedConfig Config
 	var errors []comparisonValidationErrors
 	var globalErrors []string
 
+	// This check will need to be changed when more commands are added
+	if len(raw.CompareModules.Comparisons) == 0 {
+		globalErrors = append(globalErrors, "config has no comparisons configured")
+	}
+
 	var globalPattern *regexp.Regexp
 	var err error
+
 	if raw.CompareModules.ValueRegex != "" {
 		globalPattern, err = regexp.Compile(raw.CompareModules.ValueRegex)
 		if err != nil {
 			globalErrors = append(globalErrors, fmt.Sprintf("invalid global valueRegex: %s", err.Error()))
 		}
 	}
+
+	var validatedConfig Config
 	validatedConfig.CompareModules.ValueRegex = globalPattern
 
 	for c, comparison := range raw.CompareModules.Comparisons {
@@ -60,8 +67,14 @@ func NewConfigFromRaw(raw RawConfig) (Config, error) {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d has an empty label", s+1))
 			}
 
+			if len(strings.TrimSpace(source.Path)) == 0 {
+				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d is empty", s+1))
+				continue
+			}
+
 			if !strings.HasSuffix(source.Path, ".tf") {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d should have the extension .tf", s+1))
+				continue
 			}
 
 			_, err := os.Stat(source.Path)
@@ -83,7 +96,11 @@ func NewConfigFromRaw(raw RawConfig) (Config, error) {
 			}
 
 			for _, source := range comparison.Sources {
-				validatedComparison.Sources = append(validatedComparison.Sources, Source(source))
+				validatedSource := Source{
+					Path:  strings.TrimSpace(source.Path),
+					Label: strings.TrimSpace(source.Label),
+				}
+				validatedComparison.Sources = append(validatedComparison.Sources, validatedSource)
 			}
 
 			validatedConfig.CompareModules.Comparisons = append(validatedConfig.CompareModules.Comparisons, validatedComparison)
