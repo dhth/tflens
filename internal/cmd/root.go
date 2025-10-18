@@ -29,9 +29,10 @@ func Execute(version string) error {
 
 func NewRootCommand(version string) (*cobra.Command, error) {
 	var config domain.Config
+	var configPath string
 
 	preRunE := func(_ *cobra.Command, _ []string) error {
-		configBytes, err := os.ReadFile(configFileName)
+		configBytes, err := os.ReadFile(configPath)
 		if err != nil {
 			return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
 		}
@@ -50,6 +51,14 @@ func NewRootCommand(version string) (*cobra.Command, error) {
 		SilenceErrors: true,
 		Version:       version,
 	}
+
+	rootCmd.PersistentFlags().StringVarP(
+		&configPath,
+		"config-path",
+		"c",
+		configFileName,
+		"path to tflens' configuration file",
+	)
 
 	compareModulesCmd := newCompareModulesCmd(
 		preRunE,
