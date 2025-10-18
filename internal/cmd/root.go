@@ -56,7 +56,10 @@ func NewRootCommand(version string) (*cobra.Command, error) {
 		&config,
 	)
 
+	configCmd := newConfigCmd()
+
 	rootCmd.AddCommand(compareModulesCmd)
+	rootCmd.AddCommand(configCmd)
 
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
