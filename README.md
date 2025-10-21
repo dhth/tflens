@@ -15,11 +15,20 @@
 Install
 ---
 
+**homebrew**:
+
+```sh
+brew install dhth/tap/tflens
+```
+
 **go**:
 
 ```sh
 go install github.com/dhth/tflens@latest
 ```
+
+Or get the binary directly from a [release][1]. Read more about verifying the
+authenticity of released artifacts [here](#-verifying-release-artifacts).
 
 Usage
 ---
@@ -68,3 +77,47 @@ module_a    1.0.24    1.0.24     1.0.24     ✓
 module_b    0.2.0     0.2.0      -          ✗
 module_c    1.1.1     1.1.1      1.1.0      ✗
 ```
+
+🔐 Verifying release artifacts
+---
+
+In case you get the `tflens` binary directly from a [release][4], you may want to
+verify its authenticity. Checksums are applied to all released artifacts, and
+the resulting checksum file is signed using
+[cosign](https://docs.sigstore.dev/cosign/installation/).
+
+Steps to verify (replace `A.B.C` in the commands listed below with the version
+you want):
+
+1. Download the following files from the release:
+
+    - tflens_A.B.C_checksums.txt
+    - tflens_A.B.C_checksums.txt.pem
+    - tflens_A.B.C_checksums.txt.sig
+
+2. Verify the signature:
+
+   ```shell
+   cosign verify-blob tflens_A.B.C_checksums.txt \
+       --certificate tflens_A.B.C_checksums.txt.pem \
+       --signature tflens_A.B.C_checksums.txt.sig \
+       --certificate-identity-regexp 'https://github\.com/dhth/tflens/\.github/workflows/.+' \
+       --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+   ```
+
+3. Download the compressed archive you want, and validate its checksum:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/tflens/releases/download/vA.B.C/tflens_A.B.C_linux_amd64.tar.gz
+   sha256sum --ignore-missing -c tflens_A.B.C_checksums.txt
+   ```
+
+3. If checksum validation goes through, uncompress the archive:
+
+   ```shell
+   tar -xzf tflens_A.B.C_linux_amd64.tar.gz
+   ./tflens
+   # profit!
+   ```
+
+[1]: https://github.com/dhth/tflens/releases

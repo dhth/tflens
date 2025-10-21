@@ -31,6 +31,16 @@ signs:
       - "--yes"
     artifacts: checksum
 
+homebrew_casks:
+  - name: tflens
+    repository:
+      owner: dhth
+      name: homebrew-tap
+    directory: Casks
+    license: MIT
+    homepage: "https://github.com/dhth/tflens"
+    description: "tflens offers tiny utilities for terraform/opentofu/terragrunt codebases"
+
 changelog:
   sort: asc
   filters:
