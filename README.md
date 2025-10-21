@@ -81,7 +81,7 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 🔐 Verifying release artifacts
 ---
 
-In case you get the `tflens` binary directly from a [release][4], you may want to
+In case you get the `tflens` binary directly from a [release][1], you may want to
 verify its authenticity. Checksums are applied to all released artifacts, and
 the resulting checksum file is signed using
 [cosign](https://docs.sigstore.dev/cosign/installation/).
@@ -116,7 +116,7 @@ you want):
 
    ```shell
    tar -xzf tflens_A.B.C_linux_amd64.tar.gz
-   ./tflens
+   ./tflens -h
    # profit!
    ```
 
