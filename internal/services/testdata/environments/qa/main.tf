@@ -15,3 +15,9 @@ module "module_c" {
   environment                  = var.environment
   prefix                       = var.prefix
 }
+
+module "module_e" {
+  source = "git@github.com:dhth/infrastructure//modules/applications/module-e?ref=module-e-v0.1.0"
+  environment                  = var.environment
+  prefix                       = var.prefix
+}

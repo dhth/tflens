@@ -1,32 +1,20 @@
 package services
 
 import (
-	"errors"
-	"fmt"
-	"io"
 	"regexp"
 	"slices"
 	"sort"
-	"text/tabwriter"
 
 	"github.com/dhth/tflens/internal/domain"
 	"github.com/dhth/tflens/internal/hcl"
 )
 
-var (
-	ErrCouldntWriteTable = errors.New("couldn't write table")
-	ErrModulesNotInSync  = errors.New("modules not in sync")
-)
-
-type syncStatus uint8
-
-const (
-	statusInSync syncStatus = iota
-	statusOutOfSync
-	statusUnknown
-)
-
-func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, globalValueRegex *regexp.Regexp, outputFormat domain.OutputFormat) error {
+func GetComparisonResult(
+	comparison domain.Comparison,
+	globalValueRegex *regexp.Regexp,
+	ignoreMissingModules bool,
+) (domain.ComparisonResult, error) {
+	var zero domain.ComparisonResult
 	sourceLabels := make([]string, len(comparison.Sources))
 	for i, source := range comparison.Sources {
 		sourceLabels[i] = source.Label
@@ -43,7 +31,7 @@ func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, global
 	for _, source := range comparison.Sources {
 		result, err := hcl.ParseModules(source.Path, comparison.AttributeKey, valueRegex)
 		if err != nil {
-			return err
+			return zero, err
 		}
 
 		for _, mod := range result {
@@ -61,83 +49,50 @@ func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, global
 		}
 	}
 
-	switch outputFormat {
-	case domain.StdoutOutput:
-		inSync, err := writeTable(writer, store, sourceLabels)
-		if err != nil {
-			return fmt.Errorf("%w: %w", ErrCouldntWriteTable, err)
-		}
-
-		if !inSync {
-			return ErrModulesNotInSync
-		}
-	case domain.HtmlOutput:
-		fmt.Println("todo")
-	}
-
-	return nil
+	return buildComparisonResult(store, sourceLabels, ignoreMissingModules), nil
 }
 
-func writeTable(w io.Writer, store map[string]map[string]string, sourceLabels []string) (bool, error) {
-	tw := tabwriter.NewWriter(w, 0, 4, 4, ' ', 0)
-
-	fmt.Fprint(tw, "module")
-	for _, label := range sourceLabels {
-		fmt.Fprintf(tw, "\t%s", label)
-	}
-	fmt.Fprint(tw, "\tin-sync")
-	fmt.Fprintln(tw)
-
+func buildComparisonResult(store map[string]map[string]string, sourceLabels []string, ignoreMissingModules bool) domain.ComparisonResult {
 	modules := make([]string, 0, len(store))
-	for module := range store {
-		modules = append(modules, module)
+	for k := range store {
+		modules = append(modules, k)
 	}
 	sort.Strings(modules)
 
-	inSync := true
-	for _, module := range modules {
-		fmt.Fprint(tw, module)
-		labelValues := store[module]
+	moduleResults := make([]domain.ModuleResult, 0, len(modules))
+	for _, moduleName := range modules {
+		labelToAttr := store[moduleName]
 
-		var values []string
-		hasMissing := false
+		values := make(map[string]string)
 
+		isMissing := false
 		for _, label := range sourceLabels {
-			value, exists := labelValues[label]
+			value, exists := labelToAttr[label]
 			if exists {
-				fmt.Fprintf(tw, "\t%s", value)
-				values = append(values, value)
+				values[label] = value
 			} else {
-				fmt.Fprint(tw, "\t-")
-				hasMissing = true
+				isMissing = true
 			}
 		}
 
-		status := getStatus(values, hasMissing)
-		var statusSymbol string
-		switch status {
-		case statusInSync:
-			statusSymbol = "✓"
-		case statusOutOfSync:
-			statusSymbol = "✗"
-			inSync = false
-		case statusUnknown:
-			statusSymbol = "-"
-		}
-		fmt.Fprintf(tw, "\t%s", statusSymbol)
-		fmt.Fprintln(tw)
+		status := determineModuleStatus(values, isMissing, ignoreMissingModules)
+
+		moduleResults = append(moduleResults, domain.ModuleResult{
+			Name:   moduleName,
+			Values: values,
+			Status: status,
+		})
 	}
 
-	return inSync, tw.Flush()
+	return domain.ComparisonResult{
+		SourceLabels: sourceLabels,
+		Modules:      moduleResults,
+	}
 }
 
-func getStatus(values []string, hasMissing bool) syncStatus {
-	if hasMissing {
-		return statusOutOfSync
-	}
-
-	if len(values) == 0 {
-		return statusUnknown
+func determineModuleStatus(values map[string]string, isMissing, ignoreMissingModules bool) domain.ModuleStatus {
+	if isMissing && !ignoreMissingModules {
+		return domain.StatusOutOfSync
 	}
 
 	var nonEmptyVersions []string
@@ -147,12 +102,8 @@ func getStatus(values []string, hasMissing bool) syncStatus {
 		}
 	}
 
-	if len(nonEmptyVersions) == 0 {
-		return statusUnknown
-	}
-
-	if len(nonEmptyVersions) != len(values) {
-		return statusOutOfSync
+	if len(nonEmptyVersions) <= 1 {
+		return domain.StatusUnknown
 	}
 
 	allMatch := true
@@ -165,8 +116,8 @@ func getStatus(values []string, hasMissing bool) syncStatus {
 	}
 
 	if allMatch {
-		return statusInSync
+		return domain.StatusInSync
 	}
 
-	return statusOutOfSync
+	return domain.StatusOutOfSync
 }

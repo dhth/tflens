@@ -7,15 +7,20 @@ import (
 
 	"github.com/dhth/tflens/internal/domain"
 	"github.com/dhth/tflens/internal/services"
+	"github.com/dhth/tflens/internal/view"
 	"github.com/spf13/cobra"
 )
 
-var errInvalidOutputFormat = errors.New("invalid output format provided")
+var (
+	errInvalidOutputFormat = errors.New("invalid output format provided")
+	ErrModulesNotInSync    = errors.New("modules not in sync")
+)
 
 func newCompareModulesCmd() *cobra.Command {
 	var config domain.Config
 	var configPath string
 	var outputFmtStr string
+	var ignoreMissingModules bool
 
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
@@ -96,7 +101,29 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 				return fmt.Errorf("%w: %q", ErrComparisonNotFound, comparisonName)
 			}
 
-			return services.ShowModuleComparison(os.Stdout, *comparisonToUse, config.CompareModules.ValueRegex, outputFmt)
+			result, err := services.GetComparisonResult(*comparisonToUse, config.CompareModules.ValueRegex, ignoreMissingModules)
+			if err != nil {
+				return err
+			}
+
+			switch outputFmt {
+			case domain.StdoutOutput:
+				err := view.RenderStdout(os.Stdout, result)
+				if err != nil {
+					return fmt.Errorf("failed to render stdout: %w", err)
+				}
+
+				for _, moduleRes := range result.Modules {
+					if moduleRes.Status == domain.StatusOutOfSync {
+						return ErrModulesNotInSync
+					}
+				}
+
+			case domain.HtmlOutput:
+				fmt.Println("todo")
+			}
+
+			return nil
 		},
 	}
 
@@ -106,6 +133,14 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 		"c",
 		configFileName,
 		"path to tflens' configuration file",
+	)
+
+	cmd.Flags().BoolVarP(
+		&ignoreMissingModules,
+		"ignore-missing-modules",
+		"i",
+		false,
+		"to not have the absence of a module lead to an out-of-sync status",
 	)
 
 	cmd.Flags().StringVarP(
