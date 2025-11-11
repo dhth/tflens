@@ -26,7 +26,7 @@ const (
 	statusUnknown
 )
 
-func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, globalValueRegex *regexp.Regexp) error {
+func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, globalValueRegex *regexp.Regexp, outputFormat domain.OutputFormat) error {
 	sourceLabels := make([]string, len(comparison.Sources))
 	for i, source := range comparison.Sources {
 		sourceLabels[i] = source.Label
@@ -61,13 +61,18 @@ func ShowModuleComparison(writer io.Writer, comparison domain.Comparison, global
 		}
 	}
 
-	inSync, err := writeTable(writer, store, sourceLabels)
-	if err != nil {
-		return fmt.Errorf("%w: %w", ErrCouldntWriteTable, err)
-	}
+	switch outputFormat {
+	case domain.StdoutOutput:
+		inSync, err := writeTable(writer, store, sourceLabels)
+		if err != nil {
+			return fmt.Errorf("%w: %w", ErrCouldntWriteTable, err)
+		}
 
-	if !inSync {
-		return ErrModulesNotInSync
+		if !inSync {
+			return ErrModulesNotInSync
+		}
+	case domain.HtmlOutput:
+		fmt.Println("todo")
 	}
 
 	return nil

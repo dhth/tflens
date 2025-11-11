@@ -38,7 +38,7 @@ func TestShowModuleComparison(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := ShowModuleComparison(&buf, comparison, valueRegex)
+		err := ShowModuleComparison(&buf, comparison, valueRegex, domain.StdoutOutput)
 
 		// THEN
 		require.Error(t, err)
@@ -71,7 +71,7 @@ func TestShowModuleComparison(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := ShowModuleComparison(&buf, comparison, valueRegex)
+		err := ShowModuleComparison(&buf, comparison, valueRegex, domain.StdoutOutput)
 
 		// THEN
 		require.NoError(t, err)

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -9,9 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var errInvalidOutputFormat = errors.New("invalid output format provided")
+
 func newCompareModulesCmd() *cobra.Command {
 	var config domain.Config
 	var configPath string
+	var outputFmtStr string
 
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
@@ -74,6 +78,11 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 			return nil
 		},
 		RunE: func(_ *cobra.Command, args []string) error {
+			outputFmt, outoutputFmtOk := domain.ParseOutputFormat(outputFmtStr)
+			if !outoutputFmtOk {
+				return fmt.Errorf("%w: %q; allowed values: %v", errInvalidOutputFormat, outputFmtStr, domain.GetOutputFormatValues())
+			}
+
 			comparisonName := args[0]
 			var comparisonToUse *domain.Comparison
 			for i := range config.CompareModules.Comparisons {
@@ -87,7 +96,7 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 				return fmt.Errorf("%w: %q", ErrComparisonNotFound, comparisonName)
 			}
 
-			return services.ShowModuleComparison(os.Stdout, *comparisonToUse, config.CompareModules.ValueRegex)
+			return services.ShowModuleComparison(os.Stdout, *comparisonToUse, config.CompareModules.ValueRegex, outputFmt)
 		},
 	}
 
@@ -97,6 +106,14 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 		"c",
 		configFileName,
 		"path to tflens' configuration file",
+	)
+
+	cmd.Flags().StringVarP(
+		&outputFmtStr,
+		"output-format",
+		"o",
+		"stdout",
+		fmt.Sprintf("output format for results; allowed values: %v", domain.GetOutputFormatValues()),
 	)
 
 	return cmd
