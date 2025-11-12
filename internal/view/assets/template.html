@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧱</text></svg>">
+        <title>{{.Title}}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        <style>
+            body {
+            font-family: "Open Sans", sans-serif;
+            }
+            * {
+            scrollbar-width: thin;
+            scrollbar-color: #928374 #282828;
+            }
+        </style>
+    </head>
+    <body class="bg-[#282828]">
+        <div class="w-4/5 max-sm:w-full max-sm:px-4 mx-auto min-h-screen pt-8">
+            <h1 class="text-[#fbf1c7] text-3xl mb-4 font-semibold">{{.Title}}</h1>
+            <p class="text-[#928374] italic mt-4">Generated at {{.Timestamp}}</p>
+            <div class="mt-2 overflow-x-auto">
+                <table class="table-auto w-full text-right max-sm:text-xs font-semibold whitespace-nowrap">
+                    <thead>
+                        <tr class="text-[#fbf1c7] bg-[#3c3836]">
+                            {{- range .Columns }}
+                            <th class="px-10 py-2">{{ . }}</th>
+                            {{- end }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{- range .Rows }}
+                        {{- if eq .Status "in_sync" }}
+                        <tr class="text-[#b8bb26]">
+                            {{- else if eq .Status "out_of_sync" }}
+                        <tr class="text-[#fb4934]">
+                            {{- else }}
+                        <tr class="text-[#928374]">
+                            {{- end }}
+                            {{- range .Data }}
+                            <td class="px-10 py-2">{{ . }}</td>
+                            {{- end }}
+                        </tr>
+                        {{- end }}
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-[#928374] italic my-10 pt-2 border-t-2 border-[#928374] border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/tflens" target="_blank">tflens</a></p>
+        </div>
+        <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+            class="hidden fixed bottom-4 left-4 z-50 bg-[#928374] text-[#282828] px-4 py-2 rounded-full shadow-lg hover:bg-[#d3869b] font-bold transition"
+            aria-label="Go to top">
+        ↑
+        </button>
+    </body>
+    <script>
+        const scrollToTopButton = document.getElementById("scrollToTop");
+
+        window.addEventListener("scroll", function () {
+        	if (window.scrollY > 100) {
+        		scrollToTopButton.classList.remove("hidden");
+        	} else {
+        		scrollToTopButton.classList.add("hidden");
+        	}
+        });
+    </script>
+</html>

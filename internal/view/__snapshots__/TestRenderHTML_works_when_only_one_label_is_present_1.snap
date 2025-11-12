@@ -1,0 +1,37 @@
+Test Comparison
+Generated at 2024-01-15 14:30:00 UTC
+
+<table>
+    <thead>
+        <tr>
+            <th>module</th>
+            <th>dev</th>
+            <th>prod-us</th>
+            <th>prod-eu</th>
+            <th>in-sync</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="na">
+            <td>module_a</td>
+            <td>1.0.0</td>
+            <td></td>
+            <td></td>
+            <td>-</td>
+        </tr>
+        <tr class="na">
+            <td>module_b</td>
+            <td></td>
+            <td>2.0.0</td>
+            <td></td>
+            <td>-</td>
+        </tr>
+        <tr class="in-sync">
+            <td>module_c</td>
+            <td>2.0.0</td>
+            <td>2.0.0</td>
+            <td>2.0.0</td>
+            <td>✓</td>
+        </tr>
+    </tbody>
+</table>
