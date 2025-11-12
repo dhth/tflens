@@ -47,8 +47,10 @@ Usage:
   tflens compare-modules <COMPARISON> [flags]
 
 Flags:
-  -c, --config-path string   path to tflens' configuration file (default "tflens.yml")
-  -h, --help                 help for compare-modules
+  -c, --config-path string       path to tflens' configuration file (default "tflens.yml")
+  -h, --help                     help for compare-modules
+  -i, --ignore-missing-modules   to not have the absence of a module lead to an out-of-sync status
+  -o, --output-format string     output format for results; allowed values: [stdout html] (default "stdout")
 
 ----- stderr -----
 

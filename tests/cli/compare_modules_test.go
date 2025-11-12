@@ -51,6 +51,23 @@ func TestCompareModulesCmd(t *testing.T) {
 		snaps.MatchStandaloneSnapshot(t, result)
 	})
 
+	t.Run("ignoring missing modules works", func(t *testing.T) {
+		// GIVEN
+		args := []string{
+			"compare-modules",
+			"--ignore-missing-modules",
+			"--config-path", "testdata/config/good.yml",
+			"apps",
+		}
+
+		// WHEN
+		result, err := fx.runCmd(args)
+
+		// THEN
+		require.NoError(t, err)
+		snaps.MatchStandaloneSnapshot(t, result)
+	})
+
 	//------------//
 	//  FAILURES  //
 	//------------//
@@ -60,6 +77,23 @@ func TestCompareModulesCmd(t *testing.T) {
 		args := []string{
 			"compare-modules",
 			"--config-path", "testdata/config/bad.yml",
+			"apps",
+		}
+
+		// WHEN
+		result, err := fx.runCmd(args)
+
+		// THEN
+		require.NoError(t, err)
+		snaps.MatchStandaloneSnapshot(t, result)
+	})
+
+	t.Run("fails for invalid output format flag", func(t *testing.T) {
+		// GIVEN
+		args := []string{
+			"compare-modules",
+			"--config-path", "testdata/config/good.yml",
+			"--output-format", "invalid",
 			"apps",
 		}
 

@@ -1,0 +1,156 @@
+
+[TestGetComparisonResult/works_for_various_cases - 1]
+sourcelabels:
+  - qa
+  - staging
+  - prod
+modules:
+  - name: module_a
+    values:
+      prod: 1.0.22
+      qa: 1.0.24
+      staging: 1.0.22
+    status: 1
+  - name: module_b
+    values:
+      prod: 0.1.8
+      qa: 0.1.10
+      staging: 0.1.6
+    status: 1
+  - name: module_c
+    values:
+      prod: 0.1.0
+      qa: 0.1.0
+      staging: 0.1.0
+    status: 0
+  - name: module_d
+    values:
+      prod: 0.2.0
+      staging: 0.2.0
+    status: 1
+  - name: module_e
+    values:
+      qa: 0.1.0
+    status: 1
+
+---
+
+[TestGetComparisonResult/works_when_missing_modules_are_to_be_ignored - 1]
+sourcelabels:
+  - qa
+  - staging
+  - prod
+modules:
+  - name: module_a
+    values:
+      prod: 1.0.22
+      qa: 1.0.24
+      staging: 1.0.22
+    status: 1
+  - name: module_b
+    values:
+      prod: 0.1.8
+      qa: 0.1.10
+      staging: 0.1.6
+    status: 1
+  - name: module_c
+    values:
+      prod: 0.1.0
+      qa: 0.1.0
+      staging: 0.1.0
+    status: 0
+  - name: module_d
+    values:
+      prod: 0.2.0
+      staging: 0.2.0
+    status: 0
+  - name: module_e
+    values:
+      qa: 0.1.0
+    status: 2
+
+---
+
+[TestGetComparisonResult/ignoring_modules_works - 1]
+sourcelabels:
+  - staging
+  - prod
+modules:
+  - name: module_c
+    values:
+      prod: 0.1.0
+      staging: 0.1.0
+    status: 0
+  - name: module_d
+    values:
+      prod: 0.2.0
+      staging: 0.2.0
+    status: 0
+
+---
+
+[TestBuildComparisonResult/works_when_missing_modules_are_not_ignored - 1]
+sourcelabels:
+  - qa
+  - staging
+  - prod
+modules:
+  - name: module_a
+    values:
+      prod: 1.2.3
+      qa: 1.2.3
+      staging: 1.2.3
+    status: 0
+  - name: module_b
+    values:
+      prod: 1.2.0
+      qa: 1.0.0
+      staging: 1.1.0
+    status: 1
+  - name: module_c
+    values:
+      prod: ""
+      qa: 2.0.0
+      staging: 2.0.0
+    status: 0
+  - name: module_d
+    values:
+      prod: ""
+      qa: 3.0.0
+      staging: ""
+    status: 2
+
+---
+
+[TestBuildComparisonResult/works_when_missing_modules_are_ignored - 1]
+sourcelabels:
+  - qa
+  - staging
+  - prod
+modules:
+  - name: module_a
+    values:
+      prod: 1.2.3
+      qa: 1.2.3
+      staging: 1.2.3
+    status: 0
+  - name: module_b
+    values:
+      prod: 1.2.0
+      qa: 1.0.0
+      staging: 1.1.0
+    status: 1
+  - name: module_c
+    values:
+      prod: ""
+      qa: 2.0.0
+      staging: 2.0.0
+    status: 0
+  - name: module_d
+    values:
+      prod: ""
+      qa: 3.0.0
+      staging: ""
+    status: 2
+
+---

@@ -1,18 +1,16 @@
 package services
 
 import (
-	"bytes"
 	"regexp"
 	"testing"
 
 	"github.com/dhth/tflens/internal/domain"
 	"github.com/gkampitakis/go-snaps/snaps"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestShowModuleComparison(t *testing.T) {
-	t.Run("modules with drift detected", func(t *testing.T) {
+func TestGetComparisonResult(t *testing.T) {
+	t.Run("works for various cases", func(t *testing.T) {
 		// GIVEN
 		valueRegex := regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
 
@@ -35,20 +33,46 @@ func TestShowModuleComparison(t *testing.T) {
 			},
 		}
 
-		var buf bytes.Buffer
-
 		// WHEN
-		err := ShowModuleComparison(&buf, comparison, valueRegex)
+		result, err := GetComparisonResult(comparison, valueRegex, false)
 
 		// THEN
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrModulesNotInSync)
-
-		output := buf.String()
-		snaps.MatchStandaloneSnapshot(t, output)
+		require.NoError(t, err)
+		snaps.MatchYAML(t, result)
 	})
 
-	t.Run("all modules in sync", func(t *testing.T) {
+	t.Run("works when missing modules are to be ignored", func(t *testing.T) {
+		// GIVEN
+		valueRegex := regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
+
+		comparison := domain.Comparison{
+			Name:         "test-comparison",
+			AttributeKey: "source",
+			Sources: []domain.Source{
+				{
+					Path:  "testdata/environments/qa/main.tf",
+					Label: "qa",
+				},
+				{
+					Path:  "testdata/environments/staging/main.tf",
+					Label: "staging",
+				},
+				{
+					Path:  "testdata/environments/prod/main.tf",
+					Label: "prod",
+				},
+			},
+		}
+
+		// WHEN
+		result, err := GetComparisonResult(comparison, valueRegex, true)
+
+		// THEN
+		require.NoError(t, err)
+		snaps.MatchYAML(t, result)
+	})
+
+	t.Run("ignoring modules works", func(t *testing.T) {
 		// GIVEN
 		valueRegex := regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
 
@@ -65,86 +89,61 @@ func TestShowModuleComparison(t *testing.T) {
 					Label: "prod",
 				},
 			},
-			IgnoreModules: []string{"module_b"},
+			IgnoreModules: []string{"module_a", "module_b"},
 		}
 
-		var buf bytes.Buffer
-
 		// WHEN
-		err := ShowModuleComparison(&buf, comparison, valueRegex)
+		result, err := GetComparisonResult(comparison, valueRegex, false)
 
 		// THEN
 		require.NoError(t, err)
-
-		output := buf.String()
-		snaps.MatchStandaloneSnapshot(t, output)
+		snaps.MatchYAML(t, result)
 	})
 }
 
-func TestGetStatus(t *testing.T) {
-	tests := []struct {
-		name       string
-		values     []string
-		hasMissing bool
-		expected   syncStatus
-	}{
-		{
-			name:     "all values match",
-			values:   []string{"1.2.3", "1.2.3", "1.2.3"},
-			expected: statusInSync,
+func TestBuildComparisonResult(t *testing.T) {
+	store := map[string]map[string]string{
+		"module_a": {
+			"qa":      "1.2.3",
+			"staging": "1.2.3",
+			"prod":    "1.2.3",
 		},
-		{
-			name:     "values don't match",
-			values:   []string{"1.2.3", "1.2.4", "1.2.3"},
-			expected: statusOutOfSync,
+		"module_b": {
+			"qa":      "1.0.0",
+			"staging": "1.1.0",
+			"prod":    "1.2.0",
 		},
-		{
-			name:       "module missing in some environments",
-			values:     []string{"1.2.3", "1.2.3"},
-			hasMissing: true,
-			expected:   statusOutOfSync,
+		"module_c": {
+			"qa":      "2.0.0",
+			"staging": "2.0.0",
+			"prod":    "",
 		},
-		{
-			name:     "all values match with empty string ignored",
-			values:   []string{"1.2.3", "1.2.3", ""},
-			expected: statusOutOfSync,
-		},
-		{
-			name:     "values don't match with empty string",
-			values:   []string{"1.2.3", "1.2.4", ""},
-			expected: statusOutOfSync,
-		},
-		{
-			name:     "single non-empty value with empty strings",
-			values:   []string{"1.2.3", ""},
-			expected: statusOutOfSync,
-		},
-		{
-			name:     "all empty values",
-			values:   []string{"", "", ""},
-			expected: statusUnknown,
-		},
-		{
-			name:     "empty values slice",
-			values:   []string{},
-			expected: statusUnknown,
-		},
-		{
-			name:     "single matching value",
-			values:   []string{"1.2.3"},
-			expected: statusInSync,
-		},
-		{
-			name:     "two different values",
-			values:   []string{"1.2.3", "1.2.4"},
-			expected: statusOutOfSync,
+		"module_d": {
+			"qa":      "3.0.0",
+			"staging": "",
+			"prod":    "",
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := getStatus(tt.values, tt.hasMissing)
-			assert.Equal(t, tt.expected, got)
-		})
-	}
+	t.Run("works when missing modules are not ignored", func(t *testing.T) {
+		// GIVEN
+		sourceLabels := []string{"qa", "staging", "prod"}
+
+		// WHEN
+		result := buildComparisonResult(store, sourceLabels, false)
+
+		// THEN
+		snaps.MatchYAML(t, result)
+	})
+
+	t.Run("works when missing modules are ignored", func(t *testing.T) {
+		// GIVEN
+		sourceLabels := []string{"qa", "staging", "prod"}
+
+		// WHEN
+		result := buildComparisonResult(store, sourceLabels, true)
+
+		// THEN
+		snaps.MatchYAML(t, result)
+	})
 }

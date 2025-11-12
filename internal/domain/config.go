@@ -51,3 +51,25 @@ type Source struct {
 	Path  string
 	Label string
 }
+
+type OutputFormat uint8
+
+const (
+	StdoutOutput OutputFormat = iota
+	HtmlOutput
+)
+
+func ParseOutputFormat(value string) (OutputFormat, bool) {
+	switch value {
+	case "stdout":
+		return StdoutOutput, true
+	case "html":
+		return HtmlOutput, true
+	default:
+		return StdoutOutput, false
+	}
+}
+
+func GetOutputFormatValues() []string {
+	return []string{"stdout", "html"}
+}
