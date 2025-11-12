@@ -64,7 +64,7 @@ func ParseOutputFormat(value string) (OutputFormat, bool) {
 	case "stdout":
 		return StdoutOutput, true
 	case "html":
-		return StdoutOutput, true
+		return HtmlOutput, true
 	default:
 		return StdoutOutput, false
 	}

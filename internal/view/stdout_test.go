@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetComparisonResult(t *testing.T) {
+func TestRenderStdout(t *testing.T) {
 	t.Run("works for all in-sync modules", func(t *testing.T) {
 		// GIVEN
 		result := domain.ComparisonResult{

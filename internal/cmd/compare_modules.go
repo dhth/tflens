@@ -83,8 +83,8 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 			return nil
 		},
 		RunE: func(_ *cobra.Command, args []string) error {
-			outputFmt, outoutputFmtOk := domain.ParseOutputFormat(outputFmtStr)
-			if !outoutputFmtOk {
+			outputFmt, outputFmtOk := domain.ParseOutputFormat(outputFmtStr)
+			if !outputFmtOk {
 				return fmt.Errorf("%w: %q; allowed values: %v", errInvalidOutputFormat, outputFmtStr, domain.GetOutputFormatValues())
 			}
 
