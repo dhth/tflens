@@ -40,6 +40,7 @@ func TestCompareModulesCmd(t *testing.T) {
 		args := []string{
 			"compare-modules",
 			"--config-path", "testdata/config/good.yml",
+			"--stdout-plain",
 			"apps",
 		}
 
@@ -57,6 +58,7 @@ func TestCompareModulesCmd(t *testing.T) {
 			"compare-modules",
 			"--ignore-missing-modules",
 			"--config-path", "testdata/config/good.yml",
+			"--stdout-plain",
 			"apps",
 		}
 

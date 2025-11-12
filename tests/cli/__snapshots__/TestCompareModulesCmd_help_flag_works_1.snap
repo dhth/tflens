@@ -54,6 +54,7 @@ Flags:
       --html-title string        title for the HTML report (default "report")
   -i, --ignore-missing-modules   to not have the absence of a module lead to an out-of-sync status
   -o, --output-format string     output format for results; allowed values: [stdout html] (default "stdout")
+      --stdout-plain             do not use colors in stdout output
 
 ----- stderr -----
 

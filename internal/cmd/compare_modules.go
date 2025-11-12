@@ -30,6 +30,7 @@ func newCompareModulesCmd() *cobra.Command {
 	var htmlTemplatePath string
 	var htmlOutputPath string
 	var htmlTitle string
+	var stdoutPlain bool
 
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
@@ -117,7 +118,7 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 
 			switch outputFmt {
 			case domain.StdoutOutput:
-				err := view.RenderStdout(os.Stdout, result)
+				err := view.RenderStdout(os.Stdout, result, stdoutPlain)
 				if err != nil {
 					return fmt.Errorf("failed to render stdout: %w", err)
 				}
@@ -210,6 +211,13 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 		"html-title",
 		"report",
 		"title for the HTML report",
+	)
+
+	cmd.Flags().BoolVar(
+		&stdoutPlain,
+		"stdout-plain",
+		false,
+		"do not use colors in stdout output",
 	)
 
 	return cmd
