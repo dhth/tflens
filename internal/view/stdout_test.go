@@ -39,7 +39,7 @@ func TestRenderStdout(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := RenderStdout(&buf, result)
+		err := RenderStdout(&buf, result, true)
 
 		// THEN
 		require.NoError(t, err)
@@ -77,7 +77,7 @@ func TestRenderStdout(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := RenderStdout(&buf, result)
+		err := RenderStdout(&buf, result, true)
 
 		// THEN
 		require.NoError(t, err)
@@ -113,7 +113,7 @@ func TestRenderStdout(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := RenderStdout(&buf, result)
+		err := RenderStdout(&buf, result, true)
 
 		// THEN
 		require.NoError(t, err)
@@ -149,7 +149,7 @@ func TestRenderStdout(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := RenderStdout(&buf, result)
+		err := RenderStdout(&buf, result, true)
 
 		// THEN
 		require.NoError(t, err)
@@ -192,7 +192,7 @@ func TestRenderStdout(t *testing.T) {
 		var buf bytes.Buffer
 
 		// WHEN
-		err := RenderStdout(&buf, result)
+		err := RenderStdout(&buf, result, true)
 
 		// THEN
 		require.NoError(t, err)

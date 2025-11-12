@@ -1,36 +1,51 @@
 
 [TestRenderStdout/works_for_all_in-sync_modules - 1]
-module      dev      prod-us    prod-eu    in-sync
-module_a    1.0.0    1.0.0      1.0.0      ✓
-module_b    2.0.0    2.0.0      2.0.0      ✓
+                                                            
+ module       dev       prod-us     prod-eu     in-sync     
+                                                            
+ module_a     1.0.0     1.0.0       1.0.0       ✓           
+ module_b     2.0.0     2.0.0       2.0.0       ✓           
+                                                            
 
 ---
 
 [TestRenderStdout/works_when_modules_are_out-of-sync - 1]
-module      dev      prod-us    prod-eu    in-sync
-module_a    1.0.0    1.0.1      2.0.0      ✗
-module_b    2.0.0    2.1.0      2.0.0      ✗
+                                                            
+ module       dev       prod-us     prod-eu     in-sync     
+                                                            
+ module_a     1.0.0     1.0.1       2.0.0       ✗           
+ module_b     2.0.0     2.1.0       2.0.0       ✗           
+                                                            
 
 ---
 
 [TestRenderStdout/works_when_missing_modules_are_ignored - 1]
-module      dev      prod-us    prod-eu    in-sync
-module_a    1.0.0    -          1.0.0      ✓
-module_b    2.0.0    2.0.0      -          ✓
+                                                            
+ module       dev       prod-us     prod-eu     in-sync     
+                                                            
+ module_a     1.0.0     -           1.0.0       ✓           
+ module_b     2.0.0     2.0.0       -           ✓           
+                                                            
 
 ---
 
 [TestRenderStdout/works_when_missing_modules_are_not_ignored - 1]
-module      dev      prod-us    prod-eu    in-sync
-module_a    1.0.0    -          1.0.0      ✗
-module_b    2.0.0    2.0.0      -          ✗
+                                                            
+ module       dev       prod-us     prod-eu     in-sync     
+                                                            
+ module_a     1.0.0     -           1.0.0       ✗           
+ module_b     2.0.0     2.0.0       -           ✗           
+                                                            
 
 ---
 
 [TestRenderStdout/works_when_only_one_label_is_present - 1]
-module      dev      prod-us    prod-eu    in-sync
-module_a    1.0.0    -          -          -
-module_b    -        2.0.0      -          -
-module_c    2.0.0    2.0.0      2.0.0      ✓
+                                                            
+ module       dev       prod-us     prod-eu     in-sync     
+                                                            
+ module_a     1.0.0     -           -           -           
+ module_b     -         2.0.0       -           -           
+ module_c     2.0.0     2.0.0       2.0.0       ✓           
+                                                            
 
 ---
