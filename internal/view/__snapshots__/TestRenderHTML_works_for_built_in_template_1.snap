@@ -61,7 +61,7 @@
             </div>
             <p class="text-[#928374] italic my-10 pt-2 border-t-2 border-[#928374] border-opacity-20">Built using <a class="font-bold" href="https://github.com/dhth/tflens" target="_blank">tflens</a></p>
         </div>
-        <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'instant'});"
+        <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
             class="hidden fixed bottom-4 left-4 z-50 bg-[#928374] text-[#282828] px-4 py-2 rounded-full shadow-lg hover:bg-[#d3869b] font-bold transition"
             aria-label="Go to top">
         ↑
