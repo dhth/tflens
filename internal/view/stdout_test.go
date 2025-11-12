@@ -168,14 +168,14 @@ func TestRenderStdout(t *testing.T) {
 					Values: map[string]string{
 						"dev": "1.0.0",
 					},
-					Status: domain.StatusUnknown,
+					Status: domain.StatusNotApplicable,
 				},
 				{
 					Name: "module_b",
 					Values: map[string]string{
 						"prod-us": "2.0.0",
 					},
-					Status: domain.StatusUnknown,
+					Status: domain.StatusNotApplicable,
 				},
 				{
 					Name: "module_c",

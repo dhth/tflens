@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/dhth/tflens/internal/domain"
 	"github.com/dhth/tflens/internal/services"
@@ -12,8 +14,12 @@ import (
 )
 
 var (
-	errInvalidOutputFormat = errors.New("invalid output format provided")
-	ErrModulesNotInSync    = errors.New("modules not in sync")
+	errInvalidOutputFormat     = errors.New("invalid output format provided")
+	ErrModulesNotInSync        = errors.New("modules not in sync")
+	errCouldntReadHTMLTemplate = errors.New("couldn't read HTML template")
+	errCouldntRenderHTML       = errors.New("couldn't render HTML")
+	errCouldntWriteHTMLReport  = errors.New("couldn't write HTML report")
+	errCouldntCreateOutputDir  = errors.New("couldn't create output directory")
 )
 
 func newCompareModulesCmd() *cobra.Command {
@@ -21,6 +27,9 @@ func newCompareModulesCmd() *cobra.Command {
 	var configPath string
 	var outputFmtStr string
 	var ignoreMissingModules bool
+	var htmlTemplatePath string
+	var htmlOutputPath string
+	var htmlTitle string
 
 	cmd := &cobra.Command{
 		Use:   "compare-modules <COMPARISON>",
@@ -120,7 +129,38 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 				}
 
 			case domain.HtmlOutput:
-				fmt.Println("todo")
+				var customTemplate *string
+				if htmlTemplatePath != "" {
+					templateBytes, err := os.ReadFile(htmlTemplatePath)
+					if err != nil {
+						return fmt.Errorf("%w %q: %w", errCouldntReadHTMLTemplate, htmlTemplatePath, err)
+					}
+					templateStr := string(templateBytes)
+					customTemplate = &templateStr
+				}
+
+				htmlConfig := view.HTMLConfig{
+					CustomTemplate: customTemplate,
+					Title:          htmlTitle,
+				}
+
+				html, err := view.RenderHTML(result, htmlConfig, time.Now())
+				if err != nil {
+					return fmt.Errorf("%w: %w", errCouldntRenderHTML, err)
+				}
+
+				outputDir := filepath.Dir(htmlOutputPath)
+				err = os.MkdirAll(outputDir, 0o755)
+				if err != nil {
+					return fmt.Errorf("%w: %w", errCouldntCreateOutputDir, err)
+				}
+
+				err = os.WriteFile(htmlOutputPath, []byte(html), 0o644)
+				if err != nil {
+					return fmt.Errorf("%w: %w", errCouldntWriteHTMLReport, err)
+				}
+
+				fmt.Printf("HTML report written to %q\n", htmlOutputPath)
 			}
 
 			return nil
@@ -149,6 +189,27 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 		"o",
 		"stdout",
 		fmt.Sprintf("output format for results; allowed values: %v", domain.GetOutputFormatValues()),
+	)
+
+	cmd.Flags().StringVar(
+		&htmlTemplatePath,
+		"html-template",
+		"",
+		"path to a custom HTML template (optional)",
+	)
+
+	cmd.Flags().StringVar(
+		&htmlOutputPath,
+		"html-output",
+		"tflens-report.html",
+		"path where the HTML report should be written",
+	)
+
+	cmd.Flags().StringVar(
+		&htmlTitle,
+		"html-title",
+		"tflens",
+		"title for the HTML report",
 	)
 
 	return cmd

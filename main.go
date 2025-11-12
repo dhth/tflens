@@ -20,8 +20,15 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 		default:
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-
 		}
+
+		if cmd.IsErrorUnexpected(err) {
+			fmt.Fprintf(os.Stderr, `
+This error is unexpected.
+Let @dhth know about this via https://github.com/dhth/tflens/issues.
+`)
+		}
+
 		os.Exit(1)
 	}
 }

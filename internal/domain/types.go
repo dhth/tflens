@@ -5,19 +5,19 @@ type ModuleStatus int
 const (
 	StatusInSync ModuleStatus = iota
 	StatusOutOfSync
-	StatusUnknown
+	StatusNotApplicable
 )
 
 func (s ModuleStatus) String() string {
 	switch s {
 	case StatusInSync:
-		return "in-sync"
+		return "in_sync"
 	case StatusOutOfSync:
-		return "out-of-sync"
-	case StatusUnknown:
-		return "unknown"
+		return "out_of_sync"
+	case StatusNotApplicable:
+		return "not_applicable"
 	default:
-		return "unknown"
+		return "not_applicable"
 	}
 }
 
@@ -27,7 +27,7 @@ func (s ModuleStatus) Symbol() string {
 		return "✓"
 	case StatusOutOfSync:
 		return "✗"
-	case StatusUnknown:
+	case StatusNotApplicable:
 		return "-"
 	default:
 		return "-"

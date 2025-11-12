@@ -103,7 +103,7 @@ func determineModuleStatus(values map[string]string, isMissing, ignoreMissingMod
 	}
 
 	if len(nonEmptyVersions) <= 1 {
-		return domain.StatusUnknown
+		return domain.StatusNotApplicable
 	}
 
 	allMatch := true
