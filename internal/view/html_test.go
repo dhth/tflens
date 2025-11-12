@@ -63,7 +63,7 @@ Generated at {{.Timestamp}}
 					Values: map[string]string{
 						"dev":     "2.0.0",
 						"prod-us": "2.0.0",
-						"prod-eu": "2.1.0",
+						"prod-eu": "2.0.0",
 					},
 					Status: domain.StatusInSync,
 				},
