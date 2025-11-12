@@ -1,6 +1,7 @@
 package view
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/dhth/tflens/internal/domain"
 )
+
+var errCouldntPrintTable = errors.New("couldn't print table")
 
 func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) error {
 	rows := make([][]string, 0, len(result.Modules))
@@ -65,7 +68,10 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 		Headers(headers...).
 		Rows(rows...)
 
-	fmt.Fprintln(writer, tbl)
+	_, err := fmt.Fprintln(writer, tbl)
+	if err != nil {
+		return fmt.Errorf("%w: %w", errCouldntPrintTable, err)
+	}
 
 	return nil
 }
