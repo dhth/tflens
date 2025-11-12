@@ -208,7 +208,7 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 	cmd.Flags().StringVar(
 		&htmlTitle,
 		"html-title",
-		"tflens",
+		"report",
 		"title for the HTML report",
 	)
 
