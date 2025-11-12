@@ -68,6 +68,24 @@ compareModules:
 You can then compare the modules as follows.
 
 ```bash
+tflens compare-modules -h
+```
+
+```
+Usage:
+  tflens compare-modules <COMPARISON> [flags]
+
+Flags:
+  -c, --config-path string       path to tflens' configuration file (default "tflens.yml")
+  -h, --help                     help for compare-modules
+      --html-output string       path where the HTML report should be written (default "tflens-report.html")
+      --html-template string     path to a custom HTML template (optional)
+      --html-title string        title for the HTML report (default "report")
+  -i, --ignore-missing-modules   to not have the absence of a module lead to an out-of-sync status
+  -o, --output-format string     output format for results; allowed values: [stdout html] (default "stdout")
+```
+
+```bash
 tflens compare-modules apps
 ```
 
