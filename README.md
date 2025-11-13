@@ -6,7 +6,7 @@
   </p>
 </p>
 
-`tflens` offers tiny utilities for terraform/opentofu/terragrunt codebases.
+`tflens` lets you compare terraform modules across environments.
 
 > [!NOTE]
 > `tflens` is alpha software. It's behaviour and interface is likely to change
@@ -90,11 +90,16 @@ tflens compare-modules apps
 ```
 
 ```text
-module      dev       prod-us    prod-eu    in-sync
-module_a    1.0.24    1.0.24     1.0.24     ✓
-module_b    0.2.0     0.2.0      -          ✗
-module_c    1.1.1     1.1.1      1.1.0      ✗
+ module       dev        prod-us     prod-eu     in-sync
+
+ module_a     1.0.24     1.0.24      1.0.24      ✓
+ module_b     0.2.0      0.2.0       -           ✗
+ module_c     1.1.1      1.1.1       1.1.0       ✗
 ```
+
+`tflens` can also generate an HTML report via the `--output-format` flag.
+
+![html-report](https://tools.dhruvs.space/images/tflens/v0-1-0/html-report.png)
 
 🔐 Verifying release artifacts
 ---
