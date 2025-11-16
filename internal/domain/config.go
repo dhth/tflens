@@ -106,9 +106,13 @@ func (c rawDiffConfig) parse() (DiffConfig, []string) {
 		errors = append(errors, "cmd is empty")
 	}
 
+	cmd := make([]string, 0, len(c.cmd))
 	for i, cmdElement := range c.cmd {
-		if len(cmdElement) == 0 {
+		trimmedElement := strings.TrimSpace(cmdElement)
+		if len(trimmedElement) == 0 {
 			errors = append(errors, fmt.Sprintf("cmd[%d] is empty", i))
+		} else {
+			cmd = append(cmd, trimmedElement)
 		}
 	}
 
@@ -120,6 +124,6 @@ func (c rawDiffConfig) parse() (DiffConfig, []string) {
 	return DiffConfig{
 		BaseLabel: baseLabel,
 		HeadLabel: headLabel,
-		Cmd:       c.cmd,
+		Cmd:       cmd,
 	}, nil
 }

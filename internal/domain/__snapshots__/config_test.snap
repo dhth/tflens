@@ -1,0 +1,41 @@
+
+[TestRawDiffConfigParse/parsing_correct_config_works - 1]
+baselabel: base
+headlabel: head
+cmd:
+  - git
+  - diff
+  - $TFLENS_BASE_REF..$TFLENS_HEAD_REF
+  - --
+  - modules/applications
+
+---
+
+[TestRawDiffConfigParse/parsing_correct_config_with_whitespace_works - 1]
+baselabel: base
+headlabel: head
+cmd:
+  - git
+  - diff
+  - $TFLENS_BASE_REF..$TFLENS_HEAD_REF
+  - --
+  - modules/applications
+
+---
+
+[TestRawDiffConfigParse/parsing_invalid_config_fails - 1]
+  - base label is empty
+  - head label is empty
+  - cmd is empty
+
+---
+
+[TestRawDiffConfigParse/parsing_invalid_config_with_whitespace_only_fails - 1]
+  - base label is empty
+  - head label is empty
+  - cmd[0] is empty
+  - cmd[1] is empty
+  - cmd[2] is empty
+  - cmd[3] is empty
+
+---
