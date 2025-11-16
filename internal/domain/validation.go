@@ -6,16 +6,32 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	yaml "github.com/goccy/go-yaml"
 )
 
-var ErrConfigHasErrors = errors.New("config has errors")
+var (
+	ErrConfigHasErrors    = errors.New("config has errors")
+	ErrCouldntParseConfig = errors.New("couldn't parse config")
+)
 
 type comparisonValidationErrors struct {
 	index  int
 	errors []string
 }
 
-func NewConfigFromRaw(raw RawConfig) (Config, error) {
+func GetConfig(configBytes []byte) (Config, error) {
+	var raw rawConfig
+
+	err := yaml.Unmarshal(configBytes, &raw)
+	if err != nil {
+		return Config{}, fmt.Errorf("%w: %w", ErrCouldntParseConfig, err)
+	}
+
+	return parseRawConfig(raw)
+}
+
+func parseRawConfig(raw rawConfig) (Config, error) {
 	var errors []comparisonValidationErrors
 	var globalErrors []string
 

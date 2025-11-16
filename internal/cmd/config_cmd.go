@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dhth/tflens/internal/domain"
 	"github.com/spf13/cobra"
 )
 
@@ -58,8 +59,8 @@ func newConfigValidateCmd() *cobra.Command {
 				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
 			}
 
-			_, err = getConfig(configBytes)
-			if errors.Is(err, ErrCouldntParseConfig) {
+			_, err = domain.GetConfig(configBytes)
+			if errors.Is(err, domain.ErrCouldntParseConfig) {
 				return err
 			} else if err != nil {
 				fmt.Println(err.Error())
