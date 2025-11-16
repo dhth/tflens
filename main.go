@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/dhth/tflens/internal/cmd"
+	"github.com/dhth/tflens/internal/domain"
 )
 
 var version = "dev"
@@ -16,7 +17,7 @@ func main() {
 		switch {
 		case errors.Is(err, cmd.ErrModulesNotInSync):
 		case errors.Is(err, cmd.ErrConfigValidationFoundErrors):
-		case errors.Is(err, cmd.ErrCouldntParseConfig):
+		case errors.Is(err, domain.ErrCouldntParseConfig):
 			fmt.Fprintf(os.Stderr, "Error: %s", err.Error())
 		default:
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())

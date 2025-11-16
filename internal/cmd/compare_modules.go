@@ -20,6 +20,7 @@ var (
 	errCouldntRenderHTML       = errors.New("couldn't render HTML")
 	errCouldntWriteHTMLReport  = errors.New("couldn't write HTML report")
 	errCouldntCreateOutputDir  = errors.New("couldn't create output directory")
+	ErrCouldntReadConfigFile   = errors.New("couldn't read config file")
 )
 
 func newCompareModulesCmd() *cobra.Command {
@@ -85,7 +86,7 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 			if err != nil {
 				return fmt.Errorf("%w: %w", ErrCouldntReadConfigFile, err)
 			}
-			config, err = getConfig(configBytes)
+			config, err = domain.GetConfig(configBytes)
 			if err != nil {
 				return err
 			}
