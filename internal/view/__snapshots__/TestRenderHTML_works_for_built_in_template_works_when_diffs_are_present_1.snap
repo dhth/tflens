@@ -91,18 +91,18 @@
 diff --git a/modules/applications/module-b/main.tf b/modules/applications/module-b.tf
 index 9b4c764..a42b111 100644
 --- a/modules/applications/module-b.tf
-&#43;&#43;&#43; b/modules/applications/module-b/main.tf
-@@ -129,20 &#43;129,21 @@ module &#34;sa_role&#34; {
++++ b/modules/applications/module-b/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
        Statement = [
          {
            Action = [
-             &#34;sqs:ReceiveMessage&#34;,
-             &#34;sqs:DeleteMessage&#34;
+             "sqs:ReceiveMessage",
+             "sqs:DeleteMessage"
            ]
-           Effect = &#34;Allow&#34;
+           Effect = "Allow"
            Resource = [
              module.people_classification_results_queue.queue_arn,
-&#43;            module.skills_classification_results_queue.queue_arn,
++            module.skills_classification_results_queue.queue_arn,
              module.job_classification_results_queue.queue_arn,
            ]
          },
@@ -118,14 +118,14 @@ index 9b4c764..a42b111 100644
 diff --git a/modules/applications/module-c/main.tf b/modules/applications/module-c.tf
 index 9b4c764..a42b111 100644
 --- a/modules/applications/module-c.tf
-&#43;&#43;&#43; b/modules/applications/module-c/main.tf
-@@ -129,20 &#43;129,21 @@ module &#34;sa_role&#34; {
++++ b/modules/applications/module-c/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
        Statement = [
          {
            Action = [
-             &#34;sqs:ReceiveMessage&#34;,
+             "sqs:ReceiveMessage",
            ]
-           Effect = &#34;Allow&#34;
+           Effect = "Allow"
            Resource = [
              module.people_classification_results_queue.queue_arn,
 -            module.skills_classification_results_queue.queue_arn,

@@ -45,7 +45,7 @@ func RenderHTML(result domain.ComparisonResult, config HTMLConfig, referenceTime
 
 		htmlData.Diffs = append(htmlData.Diffs, HTMLDiff{
 			ModuleName: moduleResult.Name,
-			Output:     string(moduleResult.DiffResult.Output),
+			Output:     template.HTML(moduleResult.DiffResult.Output),
 			BaseLabel:  moduleResult.DiffResult.BaseLabel,
 			HeadLabel:  moduleResult.DiffResult.HeadLabel,
 			BaseRef:    moduleResult.DiffResult.BaseRef,

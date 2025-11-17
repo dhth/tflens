@@ -1,6 +1,9 @@
 package view
 
-import "time"
+import (
+	"html/template"
+	"time"
+)
 
 type HTMLConfig struct {
 	CustomTemplate *string
@@ -22,7 +25,7 @@ type HTMLRow struct {
 
 type HTMLDiff struct {
 	ModuleName string
-	Output     string
+	Output     template.HTML
 	BaseLabel  string
 	HeadLabel  string
 	BaseRef    string
