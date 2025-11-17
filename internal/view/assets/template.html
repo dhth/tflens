@@ -9,21 +9,43 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        {{if .Diffs -}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/base16/gruvbox-dark-medium.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/diff.min.js"></script>
+        {{end -}}
         <style>
             body {
                 font-family: "Open Sans", sans-serif;
             }
-            * {
-                scrollbar-width: thin;
+            .diff-table {
                 scrollbar-color: #928374 #282828;
+            }
+            {{if .Diffs -}}
+            .diff-output {
+                font-family: "Fira Mono", monospace;
+                background-color: #1d2021;
+                scrollbar-color: #928374 #2e2c2c;
+            }
+            {{end -}}
+            *::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            *::-webkit-scrollbar-track {
+                background: #282828;
+            }
+            *::-webkit-scrollbar-thumb {
+                background: #a594f940;
+                border-radius: 4px;
             }
         </style>
     </head>
-    <body class="bg-[#282828]">
+    <body class="bg-[#282828] overflow-y-scroll">
         <div class="w-4/5 max-sm:w-full max-sm:px-4 mx-auto min-h-screen pt-8">
             <h1 class="text-[#fbf1c7] text-3xl mb-4 font-semibold">{{.Title}}</h1>
             <p class="text-[#928374] italic mt-4">Generated at {{.Timestamp}}</p>
-            <div class="mt-2 overflow-x-auto">
+            <div class="mt-2 overflow-x-auto diff-table">
                 <table class="table-auto w-full text-right max-sm:text-xs font-semibold whitespace-nowrap">
                     <thead>
                         <tr class="text-[#fbf1c7] bg-[#3c3836]">
@@ -49,6 +71,26 @@
                     </tbody>
                 </table>
             </div>
+            {{if .Diffs -}}
+
+            <div class="overflow-x-auto">
+                <div class="flex gap-4 items-center mt-8">
+                    <p class="text-[#fabd2f] text-xl font-semibold">Diffs</p>
+                    <button class="bg-[#83a598] text-[#282828] font-semibold text-xs p-2 hover:bg-[#fabd2f]" onclick="toggleAllDetails()">
+                    Toggle All
+                    </button>
+                </div>
+                {{range .Diffs -}}
+                <div class="my-4 overflow-x-auto">
+                    <details>
+                        <summary class="text-[#83a598] cursor-pointer max-sm:text-sm">{{.ModuleName}} {{.BaseLabel}}..{{.HeadLabel}} ({{.BaseRef}}..{{.HeadRef}})</summary>
+                        <pre class="mt-2"><code class="diff-output text-sm max-sm:text-xs">{{ .Output }}</code></pre>
+                    </details>
+                </div>
+                {{end -}}
+            </div>
+            {{end -}}
+
             <p class="text-[#928374] italic my-10 pt-2 border-t-2 border-[#92837433]">Built using <a class="font-bold" href="https://github.com/dhth/tflens" target="_blank">tflens</a></p>
         </div>
         <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
@@ -67,5 +109,19 @@
         		scrollToTopButton.classList.add("hidden");
         	}
         });
+        {{if .Diffs -}}
+
+        function toggleAllDetails() {
+            const allDetails = document.querySelectorAll("details");
+            const allOpen = Array.from(allDetails).every(d => d.open);
+            allDetails.forEach(details => {
+                details.open = !allOpen;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            hljs.highlightAll();
+        });
+        {{end -}}
     </script>
 </html>

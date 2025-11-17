@@ -11,12 +11,22 @@ type HTMLData struct {
 	Title     string
 	Columns   []string
 	Rows      []HTMLRow
+	Diffs     []HTMLDiff
 	Timestamp string
 }
 
 type HTMLRow struct {
 	Data   []string
 	Status string
+}
+
+type HTMLDiff struct {
+	ModuleName string
+	Output     string
+	BaseLabel  string
+	HeadLabel  string
+	BaseRef    string
+	HeadRef    string
 }
 
 func NewHTMLData(title string, referenceTime time.Time) HTMLData {

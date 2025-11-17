@@ -38,6 +38,17 @@ func RenderHTML(result domain.ComparisonResult, config HTMLConfig, referenceTime
 		row.Data = append(row.Data, module.Status.Symbol())
 
 		htmlData.Rows = append(htmlData.Rows, row)
+
+		if module.DiffResult != nil {
+			htmlData.Diffs = append(htmlData.Diffs, HTMLDiff{
+				ModuleName: module.Name,
+				Output:     string(module.DiffResult.Output),
+				BaseLabel:  module.DiffResult.BaseLabel,
+				HeadLabel:  module.DiffResult.HeadLabel,
+				BaseRef:    module.DiffResult.BaseRef,
+				HeadRef:    module.DiffResult.HeadRef,
+			})
+		}
 	}
 
 	var tmpl *template.Template

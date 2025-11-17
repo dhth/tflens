@@ -90,6 +90,115 @@ Generated at {{.Timestamp}}
 		snaps.MatchStandaloneSnapshot(t, output)
 	})
 
+	t.Run("works for built in template works when diffs are present", func(t *testing.T) {
+		// GIVEN
+		moduleBDiff := `
+diff --git a/modules/applications/module-b/main.tf b/modules/applications/module-b.tf
+index 9b4c764..a42b111 100644
+--- a/modules/applications/module-b.tf
++++ b/modules/applications/module-b/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
+       Statement = [
+         {
+           Action = [
+             "sqs:ReceiveMessage",
+             "sqs:DeleteMessage"
+           ]
+           Effect = "Allow"
+           Resource = [
+             module.people_classification_results_queue.queue_arn,
++            module.skills_classification_results_queue.queue_arn,
+             module.job_classification_results_queue.queue_arn,
+           ]
+         },
+       ]
+     }
+`
+
+		moduleCDiff := `
+diff --git a/modules/applications/module-c/main.tf b/modules/applications/module-c.tf
+index 9b4c764..a42b111 100644
+--- a/modules/applications/module-c.tf
++++ b/modules/applications/module-c/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
+       Statement = [
+         {
+           Action = [
+             "sqs:ReceiveMessage",
+           ]
+           Effect = "Allow"
+           Resource = [
+             module.people_classification_results_queue.queue_arn,
+-            module.skills_classification_results_queue.queue_arn,
+             module.job_classification_results_queue.queue_arn,
+           ]
+         },
+       ]
+     }
+`
+
+		moduleBDiffResult := domain.DiffResult{
+			Output:    []byte(moduleBDiff),
+			BaseLabel: "prod-us",
+			HeadLabel: "dev",
+			BaseRef:   "1.8.0",
+			HeadRef:   "2.0.0",
+		}
+
+		moduleCDiffResult := domain.DiffResult{
+			Output:    []byte(moduleCDiff),
+			BaseLabel: "prod-us",
+			HeadLabel: "dev",
+			BaseRef:   "0.8.0",
+			HeadRef:   "1.1.0",
+		}
+
+		result := domain.ComparisonResult{
+			SourceLabels: []string{"dev", "prod-us", "prod-eu"},
+			Modules: []domain.ModuleResult{
+				{
+					Name: "module_a",
+					Values: map[string]string{
+						"dev":     "1.0.0",
+						"prod-us": "1.0.0",
+						"prod-eu": "1.0.0",
+					},
+					Status: domain.StatusInSync,
+				},
+				{
+					Name: "module_b",
+					Values: map[string]string{
+						"dev":     "2.0.0",
+						"prod-us": "1.8.0",
+						"prod-eu": "1.8.0",
+					},
+					Status:     domain.StatusOutOfSync,
+					DiffResult: &moduleBDiffResult,
+				},
+				{
+					Name: "module_c",
+					Values: map[string]string{
+						"dev":     "1.1.0",
+						"prod-us": "0.8.0",
+					},
+					Status:     domain.StatusOutOfSync,
+					DiffResult: &moduleCDiffResult,
+				},
+			},
+		}
+
+		config := HTMLConfig{
+			Title: "Test Comparison with diffs",
+		}
+
+		// WHEN
+		output, err := RenderHTML(result, config, referenceTime)
+
+		// THEN
+		require.NoError(t, err)
+		snaps.MatchStandaloneSnapshot(t, output)
+	})
+
 	t.Run("works for all in sync modules", func(t *testing.T) {
 		// GIVEN
 		result := domain.ComparisonResult{
