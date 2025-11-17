@@ -78,7 +78,6 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 			}
 		}
 
-		sourceLabels := make(map[string]struct{})
 		for s, source := range comparison.Sources {
 			if len(strings.TrimSpace(source.Label)) == 0 {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d has an empty label", s+1))
@@ -99,10 +98,6 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d does not exist: %s", s+1, source.Path))
 			} else if err != nil {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("couldn't check if source #%d exists: %s", s+1, err.Error()))
-			}
-
-			if len(strings.TrimSpace(source.Label)) == 0 {
-				sourceLabels[source.Label] = struct{}{}
 			}
 		}
 

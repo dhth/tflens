@@ -28,7 +28,6 @@ type Comparison struct {
 type Source struct {
 	Path  string
 	Label string
-	Cmd   []string
 }
 
 type DiffConfig struct {

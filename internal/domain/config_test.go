@@ -13,7 +13,7 @@ func TestRawDiffConfigParse(t *testing.T) {
 		rawCfg := rawDiffConfig{
 			BaseLabel: "base",
 			HeadLabel: "head",
-			Cmd:       []string{"git", "diff", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
+			Cmd:       []string{"git", "diff", "$TFLENS_DIFF_BASE_REF..$TFLENS_DIFF_HEAD_REF", "--", "modules/applications"},
 		}
 
 		// WHEN
@@ -29,7 +29,7 @@ func TestRawDiffConfigParse(t *testing.T) {
 		rawCfg := rawDiffConfig{
 			BaseLabel: " base",
 			HeadLabel: "head ",
-			Cmd:       []string{"git", " diff ", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
+			Cmd:       []string{"git", " diff ", "$TFLENS_DIFF_BASE_REF..$TFLENS_DIFF_HEAD_REF", "--", "modules/applications"},
 		}
 
 		// WHEN

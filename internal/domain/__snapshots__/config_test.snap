@@ -5,7 +5,7 @@ headlabel: head
 cmd:
   - git
   - diff
-  - $TFLENS_BASE_REF..$TFLENS_HEAD_REF
+  - $TFLENS_DIFF_BASE_REF..$TFLENS_DIFF_HEAD_REF
   - --
   - modules/applications
 
@@ -17,7 +17,7 @@ headlabel: head
 cmd:
   - git
   - diff
-  - $TFLENS_BASE_REF..$TFLENS_HEAD_REF
+  - $TFLENS_DIFF_BASE_REF..$TFLENS_DIFF_HEAD_REF
   - --
   - modules/applications
 

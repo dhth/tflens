@@ -178,7 +178,12 @@ func generateDiff(moduleName, baseLabel, headLabel string, cmd []string) ([]byte
 	output, err := execCmd.CombinedOutput()
 	if err != nil {
 		if len(output) > 0 {
-			return zero, fmt.Errorf("running command failed: %w\n\ncommand output: %s", err, output)
+			return zero, fmt.Errorf(`running command failed: %w
+
+command output:
+---
+%s
+---`, err, output)
 		}
 
 		return zero, fmt.Errorf("running command failed: %w", err)
