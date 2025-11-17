@@ -25,30 +25,32 @@ func RenderHTML(result domain.ComparisonResult, config HTMLConfig, referenceTime
 	htmlData.Columns = append([]string{"module"}, result.SourceLabels...)
 	htmlData.Columns = append(htmlData.Columns, "in-sync")
 
-	for _, module := range result.Modules {
+	for _, moduleResult := range result.Modules {
 		row := HTMLRow{
-			Data:   []string{module.Name},
-			Status: module.Status.String(),
+			Data:   []string{moduleResult.Name},
+			Status: moduleResult.Status.String(),
 		}
 
 		for _, label := range result.SourceLabels {
-			row.Data = append(row.Data, module.Values[label])
+			row.Data = append(row.Data, moduleResult.Values[label])
 		}
 
-		row.Data = append(row.Data, module.Status.Symbol())
+		row.Data = append(row.Data, moduleResult.Status.Symbol())
 
 		htmlData.Rows = append(htmlData.Rows, row)
 
-		if module.DiffResult != nil {
-			htmlData.Diffs = append(htmlData.Diffs, HTMLDiff{
-				ModuleName: module.Name,
-				Output:     string(module.DiffResult.Output),
-				BaseLabel:  module.DiffResult.BaseLabel,
-				HeadLabel:  module.DiffResult.HeadLabel,
-				BaseRef:    module.DiffResult.BaseRef,
-				HeadRef:    module.DiffResult.HeadRef,
-			})
+		if moduleResult.DiffResult == nil {
+			continue
 		}
+
+		htmlData.Diffs = append(htmlData.Diffs, HTMLDiff{
+			ModuleName: moduleResult.Name,
+			Output:     string(moduleResult.DiffResult.Output),
+			BaseLabel:  moduleResult.DiffResult.BaseLabel,
+			HeadLabel:  moduleResult.DiffResult.HeadLabel,
+			BaseRef:    moduleResult.DiffResult.BaseRef,
+			HeadRef:    moduleResult.DiffResult.HeadRef,
+		})
 	}
 
 	var tmpl *template.Template

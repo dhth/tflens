@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -94,7 +95,7 @@ func buildComparisonResult(store map[string]map[string]string, sourceLabels []st
 			baseRef, baseExists := values[diffCfg.BaseLabel]
 			headRef, headExists := values[diffCfg.HeadLabel]
 
-			if baseExists && headExists {
+			if baseExists && headExists && (baseRef != headRef) {
 				diffOutput, diffErr := generateDiff(
 					moduleName,
 					baseRef,
@@ -161,33 +162,39 @@ func determineModuleStatus(values map[string]string, isMissing, ignoreMissingMod
 	return domain.StatusOutOfSync
 }
 
-func generateDiff(moduleName, baseLabel, headLabel string, cmd []string) ([]byte, error) {
+func generateDiff(moduleName, baseLabel, headLabel string, command []string) ([]byte, error) {
 	var zero []byte
-	if len(cmd) == 0 {
+	if len(command) == 0 {
 		return zero, fmt.Errorf("empty command")
 	}
 
-	execCmd := exec.Command(cmd[0], cmd[1:]...)
-
-	execCmd.Env = append(os.Environ(),
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("TFLENS_DIFF_BASE_REF=%s", baseLabel),
 		fmt.Sprintf("TFLENS_DIFF_HEAD_REF=%s", headLabel),
 		fmt.Sprintf("TFLENS_DIFF_MODULE_NAME=%s", moduleName),
 	)
 
-	output, err := execCmd.CombinedOutput()
-	if err != nil {
-		if len(output) > 0 {
-			return zero, fmt.Errorf(`running command failed: %w
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
 
-command output:
----
+	err := cmd.Run()
+	if err != nil {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
+			exitCode := exitError.ExitCode()
+			return zero, fmt.Errorf(`command exited with non success exit code
+
+exit_code: %d
+----- stdout -----
 %s
----`, err, output)
+----- stderr -----
+%s`, exitCode, stdoutBuf.String(), stderrBuf.String())
 		}
 
-		return zero, fmt.Errorf("running command failed: %w", err)
+		return zero, fmt.Errorf("couldn't run command: %w", err)
 	}
 
-	return output, nil
+	return stdoutBuf.Bytes(), nil
 }
