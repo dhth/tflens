@@ -34,7 +34,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, false)
+		result, err := GetComparisonResult(comparison, valueRegex, false, false)
 
 		// THEN
 		require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, true)
+		result, err := GetComparisonResult(comparison, valueRegex, true, false)
 
 		// THEN
 		require.NoError(t, err)
@@ -93,7 +93,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, false)
+		result, err := GetComparisonResult(comparison, valueRegex, false, false)
 
 		// THEN
 		require.NoError(t, err)

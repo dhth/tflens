@@ -19,7 +19,7 @@ var ErrCouldntComputeDiff = errors.New("couldn't compute diff")
 func GetComparisonResult(
 	comparison domain.Comparison,
 	globalValueRegex *regexp.Regexp,
-	ignoreMissingModules bool,
+	ignoreMissingModules, includeDiffs bool,
 ) (domain.ComparisonResult, error) {
 	var zero domain.ComparisonResult
 	sourceLabels := make([]string, len(comparison.Sources))
@@ -56,7 +56,11 @@ func GetComparisonResult(
 		}
 	}
 
-	result, err := buildComparisonResult(store, sourceLabels, ignoreMissingModules, comparison.DiffCfg)
+	var diffCfg *domain.DiffConfig
+	if includeDiffs {
+		diffCfg = comparison.DiffCfg
+	}
+	result, err := buildComparisonResult(store, sourceLabels, ignoreMissingModules, diffCfg)
 	if err != nil {
 		return zero, err
 	}
@@ -64,7 +68,12 @@ func GetComparisonResult(
 	return result, nil
 }
 
-func buildComparisonResult(store map[string]map[string]string, sourceLabels []string, ignoreMissingModules bool, diffCfg *domain.DiffConfig) (domain.ComparisonResult, error) {
+func buildComparisonResult(
+	store map[string]map[string]string,
+	sourceLabels []string,
+	ignoreMissingModules bool,
+	diffCfg *domain.DiffConfig,
+) (domain.ComparisonResult, error) {
 	modules := make([]string, 0, len(store))
 	for k := range store {
 		modules = append(modules, k)
