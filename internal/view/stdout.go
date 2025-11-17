@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/dhth/tflens/internal/domain"
 )
 
-var errCouldntPrintTable = errors.New("couldn't print table")
+var errCouldntRenderStdout = errors.New("couldn't render stdout")
 
 func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) error {
 	rows := make([][]string, 0, len(result.Modules))
@@ -68,9 +69,31 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 		Headers(headers...).
 		Rows(rows...)
 
-	_, err := fmt.Fprintln(writer, tbl)
+	var output strings.Builder
+
+	output.WriteString(tbl.String())
+	output.WriteString("\n")
+
+	for _, module := range result.Modules {
+		if module.DiffResult != nil {
+			output.WriteString(fmt.Sprintf(`
+%s %s..%s (%s..%s)
+
+%s
+`,
+				module.Name,
+				module.DiffResult.BaseLabel,
+				module.DiffResult.HeadLabel,
+				module.DiffResult.BaseRef,
+				module.DiffResult.HeadRef,
+				module.DiffResult.Output,
+			))
+		}
+	}
+
+	_, err := fmt.Fprint(writer, output.String())
 	if err != nil {
-		return fmt.Errorf("%w: %w", errCouldntPrintTable, err)
+		return fmt.Errorf("%w: %w", errCouldntRenderStdout, err)
 	}
 
 	return nil

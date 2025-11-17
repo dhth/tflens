@@ -1,6 +1,10 @@
 package services
 
 import (
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
 	"regexp"
 	"slices"
 	"sort"
@@ -8,6 +12,8 @@ import (
 	"github.com/dhth/tflens/internal/domain"
 	"github.com/dhth/tflens/internal/hcl"
 )
+
+var ErrCouldntComputeDiff = errors.New("couldn't compute diff")
 
 func GetComparisonResult(
 	comparison domain.Comparison,
@@ -49,10 +55,15 @@ func GetComparisonResult(
 		}
 	}
 
-	return buildComparisonResult(store, sourceLabels, ignoreMissingModules), nil
+	result, err := buildComparisonResult(store, sourceLabels, ignoreMissingModules, comparison.DiffCfg)
+	if err != nil {
+		return zero, err
+	}
+
+	return result, nil
 }
 
-func buildComparisonResult(store map[string]map[string]string, sourceLabels []string, ignoreMissingModules bool) domain.ComparisonResult {
+func buildComparisonResult(store map[string]map[string]string, sourceLabels []string, ignoreMissingModules bool, diffCfg *domain.DiffConfig) (domain.ComparisonResult, error) {
 	modules := make([]string, 0, len(store))
 	for k := range store {
 		modules = append(modules, k)
@@ -63,6 +74,7 @@ func buildComparisonResult(store map[string]map[string]string, sourceLabels []st
 	for _, moduleName := range modules {
 		labelToAttr := store[moduleName]
 
+		//                 label  attribute
 		values := make(map[string]string)
 
 		isMissing := false
@@ -77,17 +89,44 @@ func buildComparisonResult(store map[string]map[string]string, sourceLabels []st
 
 		status := determineModuleStatus(values, isMissing, ignoreMissingModules)
 
+		var diffResult *domain.DiffResult
+		if status == domain.StatusOutOfSync && diffCfg != nil {
+			baseRef, baseExists := values[diffCfg.BaseLabel]
+			headRef, headExists := values[diffCfg.HeadLabel]
+
+			if baseExists && headExists {
+				diffOutput, diffErr := generateDiff(
+					moduleName,
+					baseRef,
+					headRef,
+					diffCfg.Cmd,
+				)
+				if diffErr != nil {
+					return domain.ComparisonResult{}, fmt.Errorf("%w for module %q (command: %v): %w", ErrCouldntComputeDiff, moduleName, diffCfg.Cmd, diffErr)
+				}
+
+				diffResult = &domain.DiffResult{
+					Output:    diffOutput,
+					BaseLabel: diffCfg.BaseLabel,
+					HeadLabel: diffCfg.HeadLabel,
+					BaseRef:   baseRef,
+					HeadRef:   headRef,
+				}
+			}
+		}
+
 		moduleResults = append(moduleResults, domain.ModuleResult{
-			Name:   moduleName,
-			Values: values,
-			Status: status,
+			Name:       moduleName,
+			Values:     values,
+			Status:     status,
+			DiffResult: diffResult,
 		})
 	}
 
 	return domain.ComparisonResult{
 		SourceLabels: sourceLabels,
 		Modules:      moduleResults,
-	}
+	}, nil
 }
 
 func determineModuleStatus(values map[string]string, isMissing, ignoreMissingModules bool) domain.ModuleStatus {
@@ -120,4 +159,30 @@ func determineModuleStatus(values map[string]string, isMissing, ignoreMissingMod
 	}
 
 	return domain.StatusOutOfSync
+}
+
+func generateDiff(moduleName, baseLabel, headLabel string, cmd []string) ([]byte, error) {
+	var zero []byte
+	if len(cmd) == 0 {
+		return zero, fmt.Errorf("empty command")
+	}
+
+	execCmd := exec.Command(cmd[0], cmd[1:]...)
+
+	execCmd.Env = append(os.Environ(),
+		fmt.Sprintf("TFLENS_DIFF_BASE_REF=%s", baseLabel),
+		fmt.Sprintf("TFLENS_DIFF_HEAD_REF=%s", headLabel),
+		fmt.Sprintf("TFLENS_DIFF_MODULE_NAME=%s", moduleName),
+	)
+
+	output, err := execCmd.CombinedOutput()
+	if err != nil {
+		if len(output) > 0 {
+			return zero, fmt.Errorf("running command failed: %w\n\ncommand output: %s", err, output)
+		}
+
+		return zero, fmt.Errorf("running command failed: %w", err)
+	}
+
+	return output, nil
 }

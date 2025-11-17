@@ -34,10 +34,19 @@ func (s ModuleStatus) Symbol() string {
 	}
 }
 
+type DiffResult struct {
+	Output    []byte
+	BaseLabel string
+	HeadLabel string
+	BaseRef   string
+	HeadRef   string
+}
+
 type ModuleResult struct {
-	Name   string
-	Values map[string]string
-	Status ModuleStatus
+	Name       string
+	Values     map[string]string
+	Status     ModuleStatus
+	DiffResult *DiffResult `yaml:"diffResult,omitempty"`
 }
 
 type ComparisonResult struct {

@@ -33,9 +33,9 @@ cmd:
 [TestRawDiffConfigParse/parsing_invalid_config_with_whitespace_only_fails - 1]
   - base label is empty
   - head label is empty
-  - cmd[0] is empty
   - cmd[1] is empty
   - cmd[2] is empty
   - cmd[3] is empty
+  - cmd[4] is empty
 
 ---

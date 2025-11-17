@@ -11,9 +11,9 @@ func TestRawDiffConfigParse(t *testing.T) {
 	t.Run("parsing correct config works", func(t *testing.T) {
 		// GIVEN
 		rawCfg := rawDiffConfig{
-			baseLabel: "base",
-			headLabel: "head",
-			cmd:       []string{"git", "diff", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
+			BaseLabel: "base",
+			HeadLabel: "head",
+			Cmd:       []string{"git", "diff", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
 		}
 
 		// WHEN
@@ -27,9 +27,9 @@ func TestRawDiffConfigParse(t *testing.T) {
 	t.Run("parsing correct config with whitespace works", func(t *testing.T) {
 		// GIVEN
 		rawCfg := rawDiffConfig{
-			baseLabel: " base",
-			headLabel: "head ",
-			cmd:       []string{"git", " diff ", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
+			BaseLabel: " base",
+			HeadLabel: "head ",
+			Cmd:       []string{"git", " diff ", "$TFLENS_BASE_REF..$TFLENS_HEAD_REF", "--", "modules/applications"},
 		}
 
 		// WHEN
@@ -43,9 +43,9 @@ func TestRawDiffConfigParse(t *testing.T) {
 	t.Run("parsing invalid config fails", func(t *testing.T) {
 		// GIVEN
 		rawCfg := rawDiffConfig{
-			baseLabel: "",
-			headLabel: "",
-			cmd:       []string{},
+			BaseLabel: "",
+			HeadLabel: "",
+			Cmd:       []string{},
 		}
 
 		// WHEN
@@ -59,9 +59,9 @@ func TestRawDiffConfigParse(t *testing.T) {
 	t.Run("parsing invalid config with whitespace only fails", func(t *testing.T) {
 		// GIVEN
 		rawCfg := rawDiffConfig{
-			baseLabel: " ",
-			headLabel: "\t",
-			cmd:       []string{" ", "\t", "\n", "\t\n"},
+			BaseLabel: " ",
+			HeadLabel: "\t",
+			Cmd:       []string{" ", "\t", "\n", "\t\n"},
 		}
 
 		// WHEN

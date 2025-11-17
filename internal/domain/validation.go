@@ -110,7 +110,13 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 		if comparison.DiffCfg != nil {
 			diffCfg, diffErrors := comparison.DiffCfg.parse()
 			if len(diffErrors) > 0 {
-				comparisonErrors = append(comparisonErrors, diffErrors...)
+				diffErrorStrs := make([]string, 0, len(diffErrors))
+				for _, err := range diffErrors {
+					diffErrorStrs = append(diffErrorStrs, fmt.Sprintf("    - %s", err))
+				}
+				comparisonErrors = append(comparisonErrors,
+					fmt.Sprintf("diffConfig has errors:\n%s", strings.Join(diffErrorStrs, "\n")),
+				)
 			} else {
 				diffCfgToUse = &diffCfg
 			}

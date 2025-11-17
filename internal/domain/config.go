@@ -71,11 +71,11 @@ type rawCompareModules struct {
 
 type rawComparison struct {
 	Name          string
-	AttributeKey  string      `yaml:"attributeKey"`
-	Sources       []rawSource `yaml:"sources"`
-	IgnoreModules []string    `yaml:"ignoreModules,omitempty"`
-	ValueRegex    string      `yaml:"valueRegex,omitempty"`
-	DiffCfg       *rawDiffConfig
+	AttributeKey  string         `yaml:"attributeKey"`
+	Sources       []rawSource    `yaml:"sources"`
+	IgnoreModules []string       `yaml:"ignoreModules,omitempty"`
+	ValueRegex    string         `yaml:"valueRegex,omitempty"`
+	DiffCfg       *rawDiffConfig `yaml:"diffConfig"`
 }
 
 type rawSource struct {
@@ -84,36 +84,37 @@ type rawSource struct {
 }
 
 type rawDiffConfig struct {
-	baseLabel string   `yaml:"baseLabel"`
-	headLabel string   `yaml:"headLabel"`
-	cmd       []string `yaml:"cmd"`
+	BaseLabel string   `yaml:"baseLabel"`
+	HeadLabel string   `yaml:"headLabel"`
+	Cmd       []string `yaml:"cmd"`
 }
 
 func (c rawDiffConfig) parse() (DiffConfig, []string) {
 	var errors []string
 
-	baseLabel := strings.TrimSpace(c.baseLabel)
-	if baseLabel == "" {
+	baseLabel := strings.TrimSpace(c.BaseLabel)
+	if len(baseLabel) == 0 {
 		errors = append(errors, "base label is empty")
 	}
 
-	headLabel := strings.TrimSpace(c.headLabel)
-	if headLabel == "" {
+	headLabel := strings.TrimSpace(c.HeadLabel)
+	if len(headLabel) == 0 {
 		errors = append(errors, "head label is empty")
 	}
 
-	if len(c.cmd) == 0 {
+	if len(c.Cmd) == 0 {
 		errors = append(errors, "cmd is empty")
 	}
 
-	cmd := make([]string, 0, len(c.cmd))
-	for i, cmdElement := range c.cmd {
+	trimmedCmd := make([]string, 0, len(c.Cmd))
+	for i, cmdElement := range c.Cmd {
 		trimmedElement := strings.TrimSpace(cmdElement)
 		if len(trimmedElement) == 0 {
-			errors = append(errors, fmt.Sprintf("cmd[%d] is empty", i))
-		} else {
-			cmd = append(cmd, trimmedElement)
+			errors = append(errors, fmt.Sprintf("cmd[%d] is empty", i+1))
+			continue
 		}
+
+		trimmedCmd = append(trimmedCmd, trimmedElement)
 	}
 
 	if len(errors) > 0 {
@@ -124,6 +125,6 @@ func (c rawDiffConfig) parse() (DiffConfig, []string) {
 	return DiffConfig{
 		BaseLabel: baseLabel,
 		HeadLabel: headLabel,
-		Cmd:       cmd,
+		Cmd:       trimmedCmd,
 	}, nil
 }
