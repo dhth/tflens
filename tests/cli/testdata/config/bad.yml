@@ -11,6 +11,10 @@ compareModules:
         - path: testdata/environments/prod/main.tf
           label:
       valueRegex: "[invalidRegex"
+      diffConfig:
+        baseLabel: prod
+        headLabel: unknown
+        cmd: ["./scripts/generate-diff.sh", ""]
 
     - name:
       attributeKey:

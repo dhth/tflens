@@ -79,14 +79,18 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 		}
 
 		sourceLabels := make(map[string]struct{})
+		var validatedSources []Source
 		for s, source := range comparison.Sources {
 			trimmedLabel := strings.TrimSpace(source.Label)
+			labelOk := false
 			if len(trimmedLabel) == 0 {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d has an empty label", s+1))
 			} else {
+				labelOk = true
 				sourceLabels[trimmedLabel] = struct{}{}
 			}
 
+			pathOk := false
 			if len(strings.TrimSpace(source.Path)) == 0 {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d is empty", s+1))
 				continue
@@ -102,8 +106,17 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d does not exist: %s", s+1, source.Path))
 			} else if err != nil {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("couldn't check if source #%d exists: %s", s+1, err.Error()))
+			} else {
+				pathOk = true
 			}
 
+			if labelOk && pathOk {
+				validatedSource := Source{
+					Path:  strings.TrimSpace(source.Path),
+					Label: strings.TrimSpace(source.Label),
+				}
+				validatedSources = append(validatedSources, validatedSource)
+			}
 		}
 
 		var diffCfgToUse *DiffConfig
@@ -125,14 +138,6 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 		if len(comparisonErrors) > 0 {
 			errors = append(errors, comparisonValidationErrors{index: c, errors: comparisonErrors})
 		} else {
-			validatedSources := make([]Source, 0, len(comparison.Sources))
-			for _, source := range comparison.Sources {
-				validatedSource := Source{
-					Path:  strings.TrimSpace(source.Path),
-					Label: strings.TrimSpace(source.Label),
-				}
-				validatedSources = append(validatedSources, validatedSource)
-			}
 			validatedComparison := Comparison{
 				Name:          comparisonName,
 				AttributeKey:  attributeKey,
