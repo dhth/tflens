@@ -115,12 +115,14 @@ func buildComparisonResult(
 					return domain.ComparisonResult{}, fmt.Errorf("%w for module %q (command: %v): %w", ErrCouldntComputeDiff, moduleName, diffCfg.Cmd, diffErr)
 				}
 
-				diffResult = &domain.DiffResult{
-					Output:    diffOutput,
-					BaseLabel: diffCfg.BaseLabel,
-					HeadLabel: diffCfg.HeadLabel,
-					BaseRef:   baseRef,
-					HeadRef:   headRef,
+				if len(diffOutput) > 0 {
+					diffResult = &domain.DiffResult{
+						Output:    diffOutput,
+						BaseLabel: diffCfg.BaseLabel,
+						HeadLabel: diffCfg.HeadLabel,
+						BaseRef:   baseRef,
+						HeadRef:   headRef,
+					}
 				}
 			}
 		}
