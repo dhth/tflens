@@ -1,11 +1,13 @@
 package view
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/alecthomas/chroma/v2/quick"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/dhth/tflens/internal/domain"
@@ -76,6 +78,13 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 
 	for _, module := range result.Modules {
 		if module.DiffResult != nil {
+			var diff string
+			if plain {
+				diff = string(module.DiffResult.Output)
+			} else {
+				diff = highlightDiff(string(module.DiffResult.Output))
+			}
+
 			output.WriteString(fmt.Sprintf(`
 %s %s..%s (%s..%s)
 
@@ -86,7 +95,7 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 				module.DiffResult.HeadLabel,
 				module.DiffResult.BaseRef,
 				module.DiffResult.HeadRef,
-				module.DiffResult.Output,
+				diff,
 			))
 		}
 	}
@@ -97,4 +106,14 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 	}
 
 	return nil
+}
+
+func highlightDiff(diff string) string {
+	var buf bytes.Buffer
+	err := quick.Highlight(&buf, diff, "diff", "terminal16m", "gruvbox")
+	if err != nil {
+		return diff
+	}
+
+	return buf.String()
 }
