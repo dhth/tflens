@@ -101,6 +101,22 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 			}
 		}
 
+		var diffCfgToUse *DiffConfig
+		if comparison.DiffCfg != nil {
+			diffCfg, diffErrors := comparison.DiffCfg.parse()
+			if len(diffErrors) > 0 {
+				diffErrorStrs := make([]string, 0, len(diffErrors))
+				for _, err := range diffErrors {
+					diffErrorStrs = append(diffErrorStrs, fmt.Sprintf("    - %s", err))
+				}
+				comparisonErrors = append(comparisonErrors,
+					fmt.Sprintf("diffConfig has errors:\n%s", strings.Join(diffErrorStrs, "\n")),
+				)
+			} else {
+				diffCfgToUse = &diffCfg
+			}
+		}
+
 		if len(comparisonErrors) > 0 {
 			errors = append(errors, comparisonValidationErrors{index: c, errors: comparisonErrors})
 		} else {
@@ -109,6 +125,7 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 				AttributeKey:  attributeKey,
 				IgnoreModules: comparison.IgnoreModules,
 				ValueRegex:    comparisonPattern,
+				DiffCfg:       diffCfgToUse,
 			}
 
 			for _, source := range comparison.Sources {

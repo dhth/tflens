@@ -1,6 +1,11 @@
 package services
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
 	"regexp"
 	"slices"
 	"sort"
@@ -9,10 +14,12 @@ import (
 	"github.com/dhth/tflens/internal/hcl"
 )
 
+var ErrCouldntComputeDiff = errors.New("couldn't compute diff")
+
 func GetComparisonResult(
 	comparison domain.Comparison,
 	globalValueRegex *regexp.Regexp,
-	ignoreMissingModules bool,
+	ignoreMissingModules, includeDiffs bool,
 ) (domain.ComparisonResult, error) {
 	var zero domain.ComparisonResult
 	sourceLabels := make([]string, len(comparison.Sources))
@@ -49,10 +56,24 @@ func GetComparisonResult(
 		}
 	}
 
-	return buildComparisonResult(store, sourceLabels, ignoreMissingModules), nil
+	var diffCfg *domain.DiffConfig
+	if includeDiffs {
+		diffCfg = comparison.DiffCfg
+	}
+	result, err := buildComparisonResult(store, sourceLabels, ignoreMissingModules, diffCfg)
+	if err != nil {
+		return zero, err
+	}
+
+	return result, nil
 }
 
-func buildComparisonResult(store map[string]map[string]string, sourceLabels []string, ignoreMissingModules bool) domain.ComparisonResult {
+func buildComparisonResult(
+	store map[string]map[string]string,
+	sourceLabels []string,
+	ignoreMissingModules bool,
+	diffCfg *domain.DiffConfig,
+) (domain.ComparisonResult, error) {
 	modules := make([]string, 0, len(store))
 	for k := range store {
 		modules = append(modules, k)
@@ -63,6 +84,7 @@ func buildComparisonResult(store map[string]map[string]string, sourceLabels []st
 	for _, moduleName := range modules {
 		labelToAttr := store[moduleName]
 
+		//                 label  attribute
 		values := make(map[string]string)
 
 		isMissing := false
@@ -77,17 +99,46 @@ func buildComparisonResult(store map[string]map[string]string, sourceLabels []st
 
 		status := determineModuleStatus(values, isMissing, ignoreMissingModules)
 
+		var diffResult *domain.DiffResult
+		if status == domain.StatusOutOfSync && diffCfg != nil {
+			baseRef, baseExists := values[diffCfg.BaseLabel]
+			headRef, headExists := values[diffCfg.HeadLabel]
+
+			if baseExists && headExists && (baseRef != headRef) {
+				diffOutput, diffErr := generateDiff(
+					moduleName,
+					baseRef,
+					headRef,
+					diffCfg.Cmd,
+				)
+				if diffErr != nil {
+					return domain.ComparisonResult{}, fmt.Errorf("%w for module %q (command: %v): %w", ErrCouldntComputeDiff, moduleName, diffCfg.Cmd, diffErr)
+				}
+
+				if len(diffOutput) > 0 {
+					diffResult = &domain.DiffResult{
+						Output:    diffOutput,
+						BaseLabel: diffCfg.BaseLabel,
+						HeadLabel: diffCfg.HeadLabel,
+						BaseRef:   baseRef,
+						HeadRef:   headRef,
+					}
+				}
+			}
+		}
+
 		moduleResults = append(moduleResults, domain.ModuleResult{
-			Name:   moduleName,
-			Values: values,
-			Status: status,
+			Name:       moduleName,
+			Values:     values,
+			Status:     status,
+			DiffResult: diffResult,
 		})
 	}
 
 	return domain.ComparisonResult{
 		SourceLabels: sourceLabels,
 		Modules:      moduleResults,
-	}
+	}, nil
 }
 
 func determineModuleStatus(values map[string]string, isMissing, ignoreMissingModules bool) domain.ModuleStatus {
@@ -120,4 +171,41 @@ func determineModuleStatus(values map[string]string, isMissing, ignoreMissingMod
 	}
 
 	return domain.StatusOutOfSync
+}
+
+func generateDiff(moduleName, baseLabel, headLabel string, command []string) ([]byte, error) {
+	var zero []byte
+	if len(command) == 0 {
+		return zero, fmt.Errorf("empty command")
+	}
+
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("TFLENS_DIFF_BASE_REF=%s", baseLabel),
+		fmt.Sprintf("TFLENS_DIFF_HEAD_REF=%s", headLabel),
+		fmt.Sprintf("TFLENS_DIFF_MODULE_NAME=%s", moduleName),
+	)
+
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	err := cmd.Run()
+	if err != nil {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
+			exitCode := exitError.ExitCode()
+			return zero, fmt.Errorf(`command exited with non success exit code
+
+exit_code: %d
+----- stdout -----
+%s
+----- stderr -----
+%s`, exitCode, stdoutBuf.String(), stderrBuf.String())
+		}
+
+		return zero, fmt.Errorf("couldn't run command: %w", err)
+	}
+
+	return stdoutBuf.Bytes(), nil
 }

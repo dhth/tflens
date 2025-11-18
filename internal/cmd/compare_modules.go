@@ -27,6 +27,7 @@ func newCompareModulesCmd() *cobra.Command {
 	var config domain.Config
 	var configPath string
 	var outputFmtStr string
+	var includeDiffs bool
 	var ignoreMissingModules bool
 	var htmlTemplatePath string
 	var htmlOutputPath string
@@ -112,7 +113,12 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 				return fmt.Errorf("%w: %q", ErrComparisonNotFound, comparisonName)
 			}
 
-			result, err := services.GetComparisonResult(*comparisonToUse, config.CompareModules.ValueRegex, ignoreMissingModules)
+			result, err := services.GetComparisonResult(
+				*comparisonToUse,
+				config.CompareModules.ValueRegex,
+				ignoreMissingModules,
+				includeDiffs,
+			)
 			if err != nil {
 				return err
 			}
@@ -183,6 +189,14 @@ module_c    1.1.1     1.1.1      1.1.0      ✗
 		"i",
 		false,
 		"to not have the absence of a module lead to an out-of-sync status",
+	)
+
+	cmd.Flags().BoolVarP(
+		&includeDiffs,
+		"include-diffs",
+		"d",
+		false,
+		"include diffs between versions in report (requires diffConfig in tflens' config)",
 	)
 
 	cmd.Flags().StringVarP(

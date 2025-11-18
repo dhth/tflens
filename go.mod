@@ -3,6 +3,7 @@ module github.com/dhth/tflens
 go 1.25.3
 
 require (
+	github.com/alecthomas/chroma/v2 v2.20.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/gkampitakis/go-snaps v0.5.15
 	github.com/goccy/go-yaml v1.18.0
@@ -21,6 +22,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/gkampitakis/ciinfo v0.3.3 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

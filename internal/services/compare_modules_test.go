@@ -34,7 +34,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, false)
+		result, err := GetComparisonResult(comparison, valueRegex, false, false)
 
 		// THEN
 		require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, true)
+		result, err := GetComparisonResult(comparison, valueRegex, true, false)
 
 		// THEN
 		require.NoError(t, err)
@@ -93,7 +93,7 @@ func TestGetComparisonResult(t *testing.T) {
 		}
 
 		// WHEN
-		result, err := GetComparisonResult(comparison, valueRegex, false)
+		result, err := GetComparisonResult(comparison, valueRegex, false, false)
 
 		// THEN
 		require.NoError(t, err)
@@ -130,9 +130,10 @@ func TestBuildComparisonResult(t *testing.T) {
 		sourceLabels := []string{"qa", "staging", "prod"}
 
 		// WHEN
-		result := buildComparisonResult(store, sourceLabels, false)
+		result, err := buildComparisonResult(store, sourceLabels, false, nil)
 
 		// THEN
+		require.NoError(t, err)
 		snaps.MatchYAML(t, result)
 	})
 
@@ -141,9 +142,10 @@ func TestBuildComparisonResult(t *testing.T) {
 		sourceLabels := []string{"qa", "staging", "prod"}
 
 		// WHEN
-		result := buildComparisonResult(store, sourceLabels, true)
+		result, err := buildComparisonResult(store, sourceLabels, true, nil)
 
 		// THEN
+		require.NoError(t, err)
 		snaps.MatchYAML(t, result)
 	})
 }

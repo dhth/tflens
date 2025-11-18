@@ -5,16 +5,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧱</text></svg>">
-        <title>Test Comparison</title>
+        <title>Test Comparison with diffs</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/base16/gruvbox-dark-medium.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/diff.min.js"></script>
         <style>
             body {
                 font-family: "Open Sans", sans-serif;
             }
             .diff-table {
                 scrollbar-color: #928374 #282828;
+            }
+            .diff-output {
+                font-family: "Fira Mono", monospace;
+                background-color: #1d2021;
+                scrollbar-color: #928374 #2e2c2c;
             }
             *::-webkit-scrollbar {
                 width: 8px;
@@ -31,7 +39,7 @@
     </head>
     <body class="bg-[#282828] overflow-y-scroll">
         <div class="w-4/5 max-sm:w-full max-sm:px-4 mx-auto min-h-screen pt-8">
-            <h1 class="text-[#fbf1c7] text-3xl mb-4 font-semibold">Test Comparison</h1>
+            <h1 class="text-[#fbf1c7] text-3xl mb-4 font-semibold">Test Comparison with diffs</h1>
             <p class="text-[#928374] italic mt-4">Generated at 2024-01-15 14:30:00 UTC</p>
             <div class="mt-2 overflow-x-auto diff-table">
                 <table class="table-auto w-full text-right max-sm:text-xs font-semibold whitespace-nowrap">
@@ -52,23 +60,84 @@
                             <td class="px-10 py-2">1.0.0</td>
                             <td class="px-10 py-2">✓</td>
                         </tr>
-                        <tr class="text-[#b8bb26]">
+                        <tr class="text-[#fb4934]">
                             <td class="px-10 py-2">module_b</td>
                             <td class="px-10 py-2">2.0.0</td>
-                            <td class="px-10 py-2">2.0.0</td>
-                            <td class="px-10 py-2">2.0.0</td>
-                            <td class="px-10 py-2">✓</td>
+                            <td class="px-10 py-2">1.8.0</td>
+                            <td class="px-10 py-2">1.8.0</td>
+                            <td class="px-10 py-2">✗</td>
                         </tr>
                         <tr class="text-[#fb4934]">
                             <td class="px-10 py-2">module_c</td>
                             <td class="px-10 py-2">1.1.0</td>
-                            <td class="px-10 py-2">1.1.0</td>
+                            <td class="px-10 py-2">0.8.0</td>
                             <td class="px-10 py-2"></td>
                             <td class="px-10 py-2">✗</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <div class="overflow-x-auto">
+                <div class="flex gap-4 items-center mt-8">
+                    <p class="text-[#fabd2f] text-xl font-semibold">Diffs</p>
+                    <button class="bg-[#83a598] text-[#282828] font-semibold text-xs p-2 hover:bg-[#fabd2f]" onclick="toggleAllDetails()">
+                    Toggle All
+                    </button>
+                </div>
+                <div class="my-4 overflow-x-auto">
+                    <details>
+                        <summary class="text-[#83a598] cursor-pointer max-sm:text-sm">module_b prod-us..dev (1.8.0..2.0.0)</summary>
+                        <pre class="mt-2"><code class="diff-output language-diff text-sm max-sm:text-xs">
+diff --git a/modules/applications/module-b/main.tf b/modules/applications/module-b.tf
+index 9b4c764..a42b111 100644
+--- a/modules/applications/module-b.tf
++++ b/modules/applications/module-b/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
+       Statement = [
+         {
+           Action = [
+             "sqs:ReceiveMessage",
+             "sqs:DeleteMessage"
+           ]
+           Effect = "Allow"
+           Resource = [
+             module.people_classification_results_queue.queue_arn,
++            module.skills_classification_results_queue.queue_arn,
+             module.job_classification_results_queue.queue_arn,
+           ]
+         },
+       ]
+     }
+</code></pre>
+                    </details>
+                </div>
+                <div class="my-4 overflow-x-auto">
+                    <details>
+                        <summary class="text-[#83a598] cursor-pointer max-sm:text-sm">module_c prod-us..dev (0.8.0..1.1.0)</summary>
+                        <pre class="mt-2"><code class="diff-output language-diff text-sm max-sm:text-xs">
+diff --git a/modules/applications/module-c/main.tf b/modules/applications/module-c.tf
+index 9b4c764..a42b111 100644
+--- a/modules/applications/module-c.tf
++++ b/modules/applications/module-c/main.tf
+@@ -129,20 +129,21 @@ module "sa_role" {
+       Statement = [
+         {
+           Action = [
+             "sqs:ReceiveMessage",
+           ]
+           Effect = "Allow"
+           Resource = [
+             module.people_classification_results_queue.queue_arn,
+-            module.skills_classification_results_queue.queue_arn,
+             module.job_classification_results_queue.queue_arn,
+           ]
+         },
+       ]
+     }
+</code></pre>
+                    </details>
+                </div>
+                </div>
             <p class="text-[#928374] italic my-10 pt-2 border-t-2 border-[#92837433]">Built using <a class="font-bold" href="https://github.com/dhth/tflens" target="_blank">tflens</a></p>
         </div>
         <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
@@ -86,6 +155,17 @@
          } else {
              scrollToTopButton.classList.add("hidden");
          }
+        });
+        function toggleAllDetails() {
+            const allDetails = document.querySelectorAll("details");
+            const allOpen = Array.from(allDetails).every(d => d.open);
+            allDetails.forEach(details => {
+                details.open = !allOpen;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            hljs.highlightAll();
         });
         </script>
 </html>
