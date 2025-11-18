@@ -80,10 +80,11 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 
 		sourceLabels := make(map[string]struct{})
 		for s, source := range comparison.Sources {
-			if len(strings.TrimSpace(source.Label)) == 0 {
+			trimmedLabel := strings.TrimSpace(source.Label)
+			if len(trimmedLabel) == 0 {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d has an empty label", s+1))
 			} else {
-				sourceLabels[source.Label] = struct{}{}
+				sourceLabels[trimmedLabel] = struct{}{}
 			}
 
 			if len(strings.TrimSpace(source.Path)) == 0 {
@@ -124,20 +125,21 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 		if len(comparisonErrors) > 0 {
 			errors = append(errors, comparisonValidationErrors{index: c, errors: comparisonErrors})
 		} else {
-			validatedComparison := Comparison{
-				Name:          comparisonName,
-				AttributeKey:  attributeKey,
-				IgnoreModules: comparison.IgnoreModules,
-				ValueRegex:    comparisonPattern,
-				DiffCfg:       diffCfgToUse,
-			}
-
+			validatedSources := make([]Source, 0, len(comparison.Sources))
 			for _, source := range comparison.Sources {
 				validatedSource := Source{
 					Path:  strings.TrimSpace(source.Path),
 					Label: strings.TrimSpace(source.Label),
 				}
-				validatedComparison.Sources = append(validatedComparison.Sources, validatedSource)
+				validatedSources = append(validatedSources, validatedSource)
+			}
+			validatedComparison := Comparison{
+				Name:          comparisonName,
+				AttributeKey:  attributeKey,
+				Sources:       validatedSources,
+				IgnoreModules: comparison.IgnoreModules,
+				ValueRegex:    comparisonPattern,
+				DiffCfg:       diffCfgToUse,
 			}
 
 			validatedConfig.CompareModules.Comparisons = append(validatedConfig.CompareModules.Comparisons, validatedComparison)
