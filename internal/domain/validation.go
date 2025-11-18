@@ -78,9 +78,12 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 			}
 		}
 
+		sourceLabels := make(map[string]struct{})
 		for s, source := range comparison.Sources {
 			if len(strings.TrimSpace(source.Label)) == 0 {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("source #%d has an empty label", s+1))
+			} else {
+				sourceLabels[source.Label] = struct{}{}
 			}
 
 			if len(strings.TrimSpace(source.Path)) == 0 {
@@ -99,11 +102,12 @@ func parseRawConfig(raw rawConfig) (Config, error) {
 			} else if err != nil {
 				comparisonErrors = append(comparisonErrors, fmt.Sprintf("couldn't check if source #%d exists: %s", s+1, err.Error()))
 			}
+
 		}
 
 		var diffCfgToUse *DiffConfig
 		if comparison.DiffCfg != nil {
-			diffCfg, diffErrors := comparison.DiffCfg.parse()
+			diffCfg, diffErrors := comparison.DiffCfg.parse(sourceLabels)
 			if len(diffErrors) > 0 {
 				diffErrorStrs := make([]string, 0, len(diffErrors))
 				for _, err := range diffErrors {

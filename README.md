@@ -58,6 +58,21 @@ compareModules:
           # optional
           valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
           label: prod-eu
+      # specifies the command to be run for generating diffs between two
+      # versions of a module
+      # optional
+      diffConfig:
+        # the label to use for the base ref
+        baseLabel: prod-us
+        # the label to use for the head ref
+        headLabel: dev
+        # the command to use, as an array
+        cmd: ["./scripts/generate-diff.sh", "apps"]
+      # list of modules to ignore while comparing
+      # optional
+      ignoreModules:
+        - module_x
+        - module_y
 
   # regex to extract the desired string from the attribute value
   # applies to all comparisons
@@ -82,7 +97,9 @@ Flags:
       --html-template string     path to a custom HTML template (optional)
       --html-title string        title for the HTML report (default "report")
   -i, --ignore-missing-modules   to not have the absence of a module lead to an out-of-sync status
+  -d, --include-diffs            include diffs between versions in report (requires diffConfig in tflens' config)
   -o, --output-format string     output format for results; allowed values: [stdout html] (default "stdout")
+      --stdout-plain             do not use colors in stdout output
 ```
 
 ```bash
