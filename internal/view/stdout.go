@@ -39,7 +39,7 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 	}
 
 	plainStyle := lipgloss.NewStyle().PaddingRight(4)
-	outOfSyncStyle := plainStyle.Foreground(lipgloss.Color("1"))
+	outOfSyncStyle := plainStyle.Foreground(lipgloss.Color("9"))
 	notApplicableStyle := plainStyle.Foreground(lipgloss.Color("8"))
 
 	headers := make([]string, 0, len(result.SourceLabels)+2)
@@ -110,7 +110,7 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 
 func highlightDiff(diff string) string {
 	var buf bytes.Buffer
-	err := quick.Highlight(&buf, diff, "diff", "terminal16m", "gruvbox")
+	err := quick.Highlight(&buf, diff, "diff", "terminal16", "native")
 	if err != nil {
 		return diff
 	}
