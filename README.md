@@ -59,7 +59,9 @@ compareModules:
           valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
           label: prod-eu
       # specifies the command to be run for generating diffs between two
-      # versions of a module
+      # versions of a module; can be useful in the case the attribute being
+      # compared contains a version tag
+      # eg. source = "git@github.com:owner/repo//modules/module_a?ref=module-a-v1.3.0"
       # optional
       diffConfig:
         # the label to use for the base ref
@@ -67,6 +69,11 @@ compareModules:
         # the label to use for the head ref
         headLabel: dev
         # the command to use, as an array
+        # tflens will populate the following environment variables for this
+        # command execution
+        # - TFLENS_DIFF_BASE_REF
+        # - TFLENS_DIFF_HEAD_REF
+        # - TFLENS_DIFF_MODULE_NAME
         cmd: ["./scripts/generate-diff.sh", "apps"]
       # list of modules to ignore while comparing
       # optional
