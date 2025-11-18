@@ -88,17 +88,27 @@ type rawDiffConfig struct {
 	Cmd       []string `yaml:"cmd"`
 }
 
-func (c rawDiffConfig) parse() (DiffConfig, []string) {
+func (c rawDiffConfig) parse(labels map[string]struct{}) (DiffConfig, []string) {
 	var errors []string
 
 	baseLabel := strings.TrimSpace(c.BaseLabel)
 	if len(baseLabel) == 0 {
 		errors = append(errors, "base label is empty")
+	} else {
+		_, baseLabelOk := labels[baseLabel]
+		if !baseLabelOk {
+			errors = append(errors, fmt.Sprintf("base label %q is not in the list of defined labels", baseLabel))
+		}
 	}
 
 	headLabel := strings.TrimSpace(c.HeadLabel)
 	if len(headLabel) == 0 {
 		errors = append(errors, "head label is empty")
+	} else {
+		_, headLabelOk := labels[headLabel]
+		if !headLabelOk {
+			errors = append(errors, fmt.Sprintf("head label %q is not in the list of defined labels", headLabel))
+		}
 	}
 
 	if len(c.Cmd) == 0 {

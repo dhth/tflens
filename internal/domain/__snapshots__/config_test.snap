@@ -39,3 +39,9 @@ cmd:
   - cmd[4] is empty
 
 ---
+
+[TestRawDiffConfigParse/using_incorrect_labels_fails - 1]
+  - base label "absent" is not in the list of defined labels
+  - head label "this-too" is not in the list of defined labels
+
+---

@@ -10,6 +10,10 @@ Error: config has errors:
   - source #1 does not exist: testdata/environments/qa/missing.tf
   - source #2 is empty
   - source #3 has an empty label
+  - diffConfig has errors:
+    - base label "prod" is not in the list of defined labels
+    - head label "unknown" is not in the list of defined labels
+    - cmd[2] is empty
 - comparison #2 has errors:
   - comparison has an empty name
   - comparison has an empty attribute key

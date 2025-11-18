@@ -8,6 +8,14 @@ import (
 )
 
 func TestRawDiffConfigParse(t *testing.T) {
+	sourceLabels := make(map[string]struct{})
+	sourceLabels["base"] = struct{}{}
+	sourceLabels["head"] = struct{}{}
+
+	//-------------//
+	//  SUCCESSES  //
+	//-------------//
+
 	t.Run("parsing correct config works", func(t *testing.T) {
 		// GIVEN
 		rawCfg := rawDiffConfig{
@@ -17,7 +25,7 @@ func TestRawDiffConfigParse(t *testing.T) {
 		}
 
 		// WHEN
-		result, errors := rawCfg.parse()
+		result, errors := rawCfg.parse(sourceLabels)
 
 		// THEN
 		require.Empty(t, errors)
@@ -33,12 +41,16 @@ func TestRawDiffConfigParse(t *testing.T) {
 		}
 
 		// WHEN
-		result, errors := rawCfg.parse()
+		result, errors := rawCfg.parse(sourceLabels)
 
 		// THEN
 		require.Empty(t, errors)
 		snaps.MatchYAML(t, result)
 	})
+
+	//------------//
+	//  FAILURES  //
+	//------------//
 
 	t.Run("parsing invalid config fails", func(t *testing.T) {
 		// GIVEN
@@ -49,7 +61,7 @@ func TestRawDiffConfigParse(t *testing.T) {
 		}
 
 		// WHEN
-		_, errors := rawCfg.parse()
+		_, errors := rawCfg.parse(sourceLabels)
 
 		// THEN
 		require.NotEmpty(t, errors)
@@ -65,7 +77,23 @@ func TestRawDiffConfigParse(t *testing.T) {
 		}
 
 		// WHEN
-		_, errors := rawCfg.parse()
+		_, errors := rawCfg.parse(sourceLabels)
+
+		// THEN
+		require.NotEmpty(t, errors)
+		snaps.MatchYAML(t, errors)
+	})
+
+	t.Run("using incorrect labels fails", func(t *testing.T) {
+		// GIVEN
+		rawCfg := rawDiffConfig{
+			BaseLabel: "absent\t",
+			HeadLabel: " this-too\n",
+			Cmd:       []string{"./scripts/generate-diff.sh", "apps"},
+		}
+
+		// WHEN
+		_, errors := rawCfg.parse(sourceLabels)
 
 		// THEN
 		require.NotEmpty(t, errors)
