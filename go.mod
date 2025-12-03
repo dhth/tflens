@@ -1,6 +1,6 @@
 module github.com/dhth/tflens
 
-go 1.25.3
+go 1.25.5
 
 require (
 	github.com/alecthomas/chroma/v2 v2.20.0
