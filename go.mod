@@ -3,7 +3,7 @@ module github.com/dhth/tflens
 go 1.25.6
 
 require (
-	github.com/alecthomas/chroma/v2 v2.21.1
+	github.com/alecthomas/chroma/v2 v2.23.1
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/gkampitakis/go-snaps v0.5.19
 	github.com/goccy/go-yaml v1.19.2
