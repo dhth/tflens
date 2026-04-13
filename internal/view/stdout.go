@@ -85,7 +85,7 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 				diff = highlightDiff(string(module.DiffResult.Output))
 			}
 
-			output.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&output, `
 %s %s..%s (%s..%s)
 
 %s
@@ -96,7 +96,7 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 				module.DiffResult.BaseRef,
 				module.DiffResult.HeadRef,
 				diff,
-			))
+			)
 		}
 	}
 
