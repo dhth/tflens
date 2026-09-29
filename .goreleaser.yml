@@ -20,26 +20,13 @@ builds:
 
 signs:
   - cmd: cosign
-    signature: "${artifact}.sig"
-    certificate: "${artifact}.pem"
+    signature: "${artifact}.sigstore.json"
     args:
       - "sign-blob"
-      - "--oidc-issuer=https://token.actions.githubusercontent.com"
-      - "--output-certificate=${certificate}"
-      - "--output-signature=${signature}"
+      - "--bundle=${signature}"
       - "${artifact}"
       - "--yes"
     artifacts: checksum
-
-homebrew_casks:
-  - name: tflens
-    repository:
-      owner: dhth
-      name: homebrew-tap
-    directory: Casks
-    license: MIT
-    homepage: "https://github.com/dhth/tflens"
-    description: "tflens offers tiny utilities for terraform/opentofu/terragrunt codebases"
 
 changelog:
   sort: asc
