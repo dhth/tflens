@@ -73,8 +73,8 @@ func RenderStdout(writer io.Writer, result domain.ComparisonResult, plain bool) 
 
 	var output strings.Builder
 
-	output.WriteString(tbl.String())
-	output.WriteString("\n")
+	_, _ = output.WriteString(tbl.String())
+	_, _ = output.WriteString("\n")
 
 	for _, module := range result.Modules {
 		if module.DiffResult != nil {
