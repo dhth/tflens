@@ -9,8 +9,8 @@
 `tflens` lets you compare Terraform modules across environments.
 
 Compare module attributes like `source` or `version` to see which environments
-are in sync and which have drifted. View the results in your terminal or generate
-an HTML report to share.
+are in sync and which have drifted. View the results in your terminal or
+generate an HTML report to share.
 
 > [!NOTE]
 > `tflens` is alpha software. Its behaviour and interface are likely to change
@@ -22,9 +22,9 @@ an HTML report to share.
 ### Pre-built binaries
 
 Download a pre-built binary from the [latest
-release](https://github.com/dhth/tflens/releases/latest). See [Verifying
-release artifacts](#-verifying-release-artifacts) for instructions on verifying
-your download.
+release](https://github.com/dhth/tflens/releases/latest). See [Verifying release
+artifacts](#-verifying-release-artifacts) for instructions on verifying your
+download.
 
 ### Install from source
 
@@ -37,12 +37,13 @@ go install github.com/dhth/tflens@latest
 ⚡️ Quick start
 ---
 
-From your Terraform codebase, create a configuration file if you do not already
-have one:
+Create a configuration file if you do not already have one:
 
 ```sh
 tflens config sample > tflens.yml
 ```
+
+```yaml```
 
 Edit the generated file with the paths to your `.tf` files and labels for your
 environments. The sample defines a comparison named `apps` and extracts version
@@ -66,20 +67,21 @@ look like this:
  module_c     1.1.1      1.1.1       1.1.0       ✗
 ```
 
-A `-` means the module is missing from that environment or does not define the
+`-` means the module is missing from that environment or does not define the
 selected attribute. By default, missing values count as out of sync; use
 `--ignore-missing-modules` to ignore their absence. Terminal comparisons exit
-with a non-zero status when modules are out of sync, so you can also use them in CI.
+with a non-zero status when modules are out of sync, so you can also use them in
+CI.
 
 `>_` Commands
 ---
 
 | Command                               | What it does                           |
 |---------------------------------------|----------------------------------------|
-| `tflens config sample`                 | Print a sample configuration           |
-| `tflens config validate`               | Validate the configuration             |
-| `tflens compare-modules <COMPARISON>`   | Compare modules for a named comparison |
-| `tflens help`                          | Show all commands and flags            |
+| `tflens config sample`                | Print a sample configuration           |
+| `tflens config validate`              | Validate the configuration             |
+| `tflens compare-modules <COMPARISON>` | Compare modules for a named comparison |
+| `tflens help`                         | Show all commands and flags            |
 
 Run `tflens <command> --help` for details about a particular command.
 
@@ -87,9 +89,9 @@ Run `tflens <command> --help` for details about a particular command.
 ---
 
 `tflens` reads configuration from `tflens.yml` in the current directory by
-default. Use `--config-path` (or `-c`) with `config validate` or `compare-modules`
-to read a different file. Source paths are relative to the current directory,
-not the configuration file.
+default. Use `--config-path` (or `-c`) with `config validate` or
+`compare-modules` to read a different file. Source paths are relative to the
+current directory, not the configuration file.
 
 Each comparison has a name, an attribute to compare, and at least two sources.
 For example:
@@ -117,8 +119,8 @@ configured `version` attributes rather than the `source` addresses.
 
 ### Extracting values
 
-Without `valueRegex`, `tflens` compares the full attribute value. The regex above
-extracts `1.3.0` from a source such as
+Without `valueRegex`, `tflens` compares the full attribute value. The regex
+above extracts `1.3.0` from a source such as
 `git@github.com:owner/repo//modules/module_a?ref=module-a-v1.3.0`.
 
 Set `valueRegex` under `compareModules` to apply it to all comparisons, or under
