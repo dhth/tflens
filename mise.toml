@@ -59,9 +59,9 @@ alias = ["l:y"]
 description = "Lint YAML files"
 run = '''
 yamlfmt \
+	-conf yamlfmt.yml \
 	-lint \
 	-quiet \
-	-formatter 'retain_line_breaks_single=true' \
 	$(git ls-files '*.yml' '*.yaml')
 '''
 
