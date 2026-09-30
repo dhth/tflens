@@ -8,8 +8,6 @@
 
 `tflens` lets you compare Terraform modules across environments.
 
-Compare module attributes like `source` or `version` to see which environments are in sync and which have drifted. View the results in your terminal or generate an HTML report to share.
-
 > [!NOTE]
 > `tflens` is alpha software. Its behaviour and interface are likely to change for a while.
 
@@ -135,9 +133,10 @@ The report is written to `tflens-report.html` by default. Set `--html-output` to
 
 ![tflens HTML comparison report](https://tools.dhruvs.space/images/tflens/v0-1-0/html-report.png)
 
-### Including diffs
+🔍 Including diffs
+---
 
-If the compared values are version tags, you can include diffs in the report. Add `diffConfig` to the comparison, choosing the base and head environment labels and a command that generates the diff:
+If the compared values are version tags, you can include diffs in terminal or HTML output. Add `diffConfig` to the comparison, choosing the base and head environment labels and a command that generates the diff:
 
 ```yaml
 diffConfig:
@@ -154,11 +153,7 @@ Provide your own script or command. `tflens` passes it these environment variabl
 | `TFLENS_DIFF_HEAD_REF`    | Compared value from the head environment |
 | `TFLENS_DIFF_MODULE_NAME` | Name of the module being compared        |
 
-The command's stdout becomes the diff shown in the report. Enable diff generation with `--include-diffs`:
-
-```sh
-tflens compare-modules apps --output-format html --include-diffs
-```
+The command's stdout becomes the diff. Enable diff generation with `--include-diffs`.
 
 🔐 Verifying release artifacts
 ---
