@@ -44,13 +44,6 @@ linters:
         - name: deep-exit
         - name: confusing-naming
         - name: unused-receiver
-        - name: unhandled-error
-          arguments:
-            - fmt.Print
-            - fmt.Printf
-            - fmt.Fprintf
-            - fmt.Fprint
-            - fmt.Fprintln
   exclusions:
     generated: lax
     presets:

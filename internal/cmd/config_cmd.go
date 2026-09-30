@@ -63,14 +63,12 @@ func newConfigValidateCmd() *cobra.Command {
 			if errors.Is(err, domain.ErrCouldntParseConfig) {
 				return err
 			} else if err != nil {
-				if _, printErr := fmt.Println(err.Error()); printErr != nil {
-					return printErr
-				}
+				fmt.Println(err.Error())
 				return ErrConfigValidationFoundErrors
 			}
 
-			_, err = fmt.Println("Configuration is valid")
-			return err
+			fmt.Println("Configuration is valid")
+			return nil
 		},
 	}
 
