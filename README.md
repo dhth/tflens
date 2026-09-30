@@ -162,6 +162,12 @@ The command's stdout becomes the diff. Enable diff generation with `--include-di
 
 Each release includes checksums for all artifacts. The checksum file is signed using [cosign](https://docs.sigstore.dev/cosign/installation/) (version `3.1.3`).
 
+Every release artifact’s origin and integrity can be verified using the [GitHub CLI](https://cli.github.com/):
+
+```shell
+gh attestation verify <file> --repo dhth/tflens
+```
+
 Replace `x.y.z` below with the release version you want to verify.
 
 1. Get the checksum and cosign signature bundle from the release:

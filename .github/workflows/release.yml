@@ -10,6 +10,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+      attestations: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -24,3 +25,10 @@ jobs:
         run: mise run release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Attest release artifacts
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/*_checksums.txt
+            dist/*_checksums.txt.sigstore.json
