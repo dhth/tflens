@@ -155,6 +155,8 @@ Provide your own script or command. `tflens` passes it these environment variabl
 
 The command's stdout becomes the diff. Enable diff generation with `--include-diffs`.
 
+![tflens HTML report with diff](https://tools.dhruvs.space/images/tflens/v0-1-0/html-report-with-diff.png)
+
 🔐 Verifying release artifacts
 ---
 
