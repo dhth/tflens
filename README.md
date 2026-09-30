@@ -8,23 +8,17 @@
 
 `tflens` lets you compare Terraform modules across environments.
 
-Compare module attributes like `source` or `version` to see which environments
-are in sync and which have drifted. View the results in your terminal or
-generate an HTML report to share.
+Compare module attributes like `source` or `version` to see which environments are in sync and which have drifted. View the results in your terminal or generate an HTML report to share.
 
 > [!NOTE]
-> `tflens` is alpha software. Its behaviour and interface are likely to change
-> for a while.
+> `tflens` is alpha software. Its behaviour and interface are likely to change for a while.
 
 💾 Installation
 ---
 
 ### Pre-built binaries
 
-Download a pre-built binary from the [latest
-release](https://github.com/dhth/tflens/releases/latest). See [Verifying release
-artifacts](#-verifying-release-artifacts) for instructions on verifying your
-download.
+Download a pre-built binary from the [latest release](https://github.com/dhth/tflens/releases/latest). See [Verifying release artifacts](#-verifying-release-artifacts) for instructions on verifying your download.
 
 ### Install from source
 
@@ -43,9 +37,7 @@ Create a configuration file if you do not already have one:
 tflens config sample > tflens.yml
 ```
 
-Edit the generated file with the paths to your `.tf` files and labels for your
-environments. The sample defines a comparison named `apps` and extracts version
-numbers from each module's `source` attribute.
+Edit the generated file with the paths to your `.tf` files and labels for your environments. The sample defines a comparison named `apps` and extracts version numbers from each module's `source` attribute.
 
 Validate the configuration, then run the comparison:
 
@@ -54,8 +46,7 @@ tflens config validate
 tflens compare-modules apps
 ```
 
-For three environments named `dev`, `prod-us`, and `prod-eu`, the output might
-look like this:
+For three environments named `dev`, `prod-us`, and `prod-eu`, the output might look like this:
 
 ```text
  module       dev        prod-us     prod-eu     in-sync
@@ -65,11 +56,7 @@ look like this:
  module_c     1.1.1      1.1.1       1.1.0       ✗
 ```
 
-`-` means the module is missing from that environment or does not define the
-selected attribute. By default, missing values count as out of sync; use
-`--ignore-missing-modules` to ignore their absence. Terminal comparisons exit
-with a non-zero status when modules are out of sync, so you can also use them in
-CI.
+`-` means the module is missing from that environment or does not define the selected attribute. By default, missing values count as out of sync; use `--ignore-missing-modules` to ignore their absence. Terminal comparisons exit with a non-zero status when modules are out of sync, so you can also use them in CI.
 
 `>_` Commands
 ---
@@ -86,13 +73,9 @@ Run `tflens <command> --help` for details about a particular command.
 ⚙️ Configuration
 ---
 
-`tflens` reads configuration from `tflens.yml` in the current directory by
-default. Use `--config-path` (or `-c`) with `config validate` or
-`compare-modules` to read a different file. Source paths are relative to the
-current directory, not the configuration file.
+`tflens` reads configuration from `tflens.yml` in the current directory by default. Use `--config-path` (or `-c`) with `config validate` or `compare-modules` to read a different file. Source paths are relative to the current directory, not the configuration file.
 
-Each comparison has a name, an attribute to compare, and at least two sources.
-The generated sample configuration looks like this:
+Each comparison has a name, an attribute to compare, and at least two sources. The generated sample configuration looks like this:
 
 ```yaml
 # tflens.yml
@@ -119,21 +102,15 @@ compareModules:
   valueRegex: 'v?(\d+\.\d+\.\d+)'
 ```
 
-Add more entries to `comparisons` to compare other groups of modules. For
-Terraform Registry modules, use `attributeKey: version` to compare the
-configured `version` attributes rather than the `source` addresses.
+Add more entries to `comparisons` to compare other groups of modules. For Terraform Registry modules, use `attributeKey: version` to compare the configured `version` attributes rather than the `source` addresses.
 
 ### Extracting values
 
-Without `valueRegex`, `tflens` compares the full attribute value. The regex
-above extracts `1.3.0` from a source such as
-`git@github.com:owner/repo//modules/module_a?ref=module-a-v1.3.0`.
+Without `valueRegex`, `tflens` compares the full attribute value. The regex above extracts `1.3.0` from a source such as `git@github.com:owner/repo//modules/module_a?ref=module-a-v1.3.0`.
 
-Set `valueRegex` under `compareModules` to apply it to all comparisons, or under
-an individual comparison to override it for that comparison.
+Set `valueRegex` under `compareModules` to apply it to all comparisons, or under an individual comparison to override it for that comparison.
 
-`tflens` uses the first capture group. If the regex does not match or has no
-capture group, it compares the original attribute value.
+`tflens` uses the first capture group. If the regex does not match or has no capture group, it compares the original attribute value.
 
 ### Ignoring modules
 
@@ -154,17 +131,13 @@ Generate a report you can open in a browser:
 tflens compare-modules apps --output-format html
 ```
 
-The report is written to `tflens-report.html` by default. Set `--html-output` to
-choose another path, `--html-title` to change the title, or `--html-template` to
-use a custom template.
+The report is written to `tflens-report.html` by default. Set `--html-output` to choose another path, `--html-title` to change the title, or `--html-template` to use a custom template.
 
 ![tflens HTML comparison report](https://tools.dhruvs.space/images/tflens/v0-1-0/html-report.png)
 
 ### Including diffs
 
-If the compared values are version tags, you can include diffs in the report.
-Add `diffConfig` to the comparison, choosing the base and head environment
-labels and a command that generates the diff:
+If the compared values are version tags, you can include diffs in the report. Add `diffConfig` to the comparison, choosing the base and head environment labels and a command that generates the diff:
 
 ```yaml
 diffConfig:
@@ -173,8 +146,7 @@ diffConfig:
   cmd: ["./scripts/generate-diff.sh", "apps"]
 ```
 
-Provide your own script or command. `tflens` passes it these environment
-variables:
+Provide your own script or command. `tflens` passes it these environment variables:
 
 | Variable                  | What it contains                         |
 |---------------------------|------------------------------------------|
@@ -182,8 +154,7 @@ variables:
 | `TFLENS_DIFF_HEAD_REF`    | Compared value from the head environment |
 | `TFLENS_DIFF_MODULE_NAME` | Name of the module being compared        |
 
-The command's stdout becomes the diff shown in the report. Enable diff
-generation with `--include-diffs`:
+The command's stdout becomes the diff shown in the report. Enable diff generation with `--include-diffs`:
 
 ```sh
 tflens compare-modules apps --output-format html --include-diffs
@@ -192,9 +163,7 @@ tflens compare-modules apps --output-format html --include-diffs
 🔐 Verifying release artifacts
 ---
 
-Each release includes checksums for all artifacts. The checksum file is signed
-using [cosign](https://docs.sigstore.dev/cosign/installation/) (version
-`3.1.3`).
+Each release includes checksums for all artifacts. The checksum file is signed using [cosign](https://docs.sigstore.dev/cosign/installation/) (version `3.1.3`).
 
 Replace `x.y.z` below with the release version you want to verify.
 
@@ -215,8 +184,7 @@ Replace `x.y.z` below with the release version you want to verify.
         tflens_x.y.z_checksums.txt
     ```
 
-3. Download the archive for your platform and validate its checksum. For example,
-   for Linux x86-64:
+3. Download the archive for your platform and validate its checksum. For example, for Linux x86-64:
 
     ```shell
     curl -sSLO https://github.com/dhth/tflens/releases/download/vx.y.z/tflens_x.y.z_linux_amd64.tar.gz
