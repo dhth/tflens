@@ -1,27 +1,22 @@
 # tflens.yml
 
 compareModules:
-  # list of configured comparisons
+  # Define one or more named comparisons.
   comparisons:
-    # will be used when specifying the comparison to be run
     - name: apps
-      # the attribute to use for comparison
+      # The module attribute to compare, such as source or version.
       attributeKey: source
-      # where to look for terraform files
+      # Compare at least two .tf files. Paths are relative to the current directory.
       sources:
         - path: environments/dev/virginia/apps/main.tf
-          # this label will appear in the comparison output
+          # This label appears in the comparison output.
           label: dev
         - path: environments/prod/virginia/apps/main.tf
           label: prod-us
         - path: environments/prod/frankfurt/apps/main.tf
-          # regex to extract the desired string from the attribute value
-          # only applies to this source, overrides the global valueRegex
-          # optional
-          valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
           label: prod-eu
 
-  # regex to extract the desired string from the attribute value
-  # applies to all comparisons
-  # optional
-  valueRegex: "v?(\\d+\\.\\d+\\.\\d+)"
+  # Optional. Extract version numbers instead of comparing the full attribute.
+  # Applies to all comparisons unless overridden by a comparison.
+  # Uses the first capture group; falls back to the full value if there is no match.
+  valueRegex: 'v?(\d+\.\d+\.\d+)'

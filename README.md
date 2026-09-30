@@ -43,8 +43,6 @@ Create a configuration file if you do not already have one:
 tflens config sample > tflens.yml
 ```
 
-```yaml```
-
 Edit the generated file with the paths to your `.tf` files and labels for your
 environments. The sample defines a comparison named `apps` and extracts version
 numbers from each module's `source` attribute.
@@ -94,15 +92,21 @@ default. Use `--config-path` (or `-c`) with `config validate` or
 current directory, not the configuration file.
 
 Each comparison has a name, an attribute to compare, and at least two sources.
-For example:
+The generated sample configuration looks like this:
 
 ```yaml
+# tflens.yml
+
 compareModules:
+  # Define one or more named comparisons.
   comparisons:
     - name: apps
+      # The module attribute to compare, such as source or version.
       attributeKey: source
+      # Compare at least two .tf files. Paths are relative to the current directory.
       sources:
         - path: environments/dev/virginia/apps/main.tf
+          # This label appears in the comparison output.
           label: dev
         - path: environments/prod/virginia/apps/main.tf
           label: prod-us
@@ -110,6 +114,8 @@ compareModules:
           label: prod-eu
 
   # Optional. Extract version numbers instead of comparing the full attribute.
+  # Applies to all comparisons unless overridden by a comparison.
+  # Uses the first capture group; falls back to the full value if there is no match.
   valueRegex: 'v?(\d+\.\d+\.\d+)'
 ```
 
